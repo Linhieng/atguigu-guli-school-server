@@ -11,8 +11,8 @@ var _todos = require("../controllers/todos");
 
 var router = (0, _express.Router)();
 router.post('/', _todos.createTodo);
-router.get('/');
-router.patch('/:id');
-router["delete"]('/:id');
+router.get('/', _todos.getTodos);
+router.patch('/:id', _todos.updateTodo);
+router["delete"]('/:id', _todos.deleteTodo);
 var _default = router;
 exports["default"] = _default;
