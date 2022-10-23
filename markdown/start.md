@@ -1,5 +1,7 @@
 ## 🍕 初始化
 
+### 初始化 npm, ts, eslint
+
 ```bash
 npm init -y
 
@@ -8,56 +10,40 @@ tsc --init
 
 npm init @eslint/config
 # 初始化 .eslintrc.js 并安装相应的插件
-
-npm i express body-parser
-# 安装依赖
-
-npm i -D @types/node @types/express @babel/cli @babel/core @babel/preset-env @babel/preset-typescript babel-plugin-root-import
-# @types/node
-# @types/express
-# @babel/cli
-# @babel/core
-# @babel/preset-env
-# @babel/preset-typescript
-# babel-plugin-root-import
 ```
 
-配置
-`.gitignore`
-`.eslintrc.js`,
-`.eslintignore`,
-`tsconfig.json`,
-`babel.config.json`,
-`package.json`
+### 安装依赖
 
-- `package.json`
+- babel
 
-```json
-{
-  "scripts": {
-    "babel": "babel src -d dist -x \".ts\" -w",
-    "typeCheck": "tsc --noEmit --watch",
-    "nodemon": "npx nodemon dist/app.js"
-  },
-}
-```
+  ```bash
+  npm i -D  @babel/cli @babel/core @babel/preset-env @babel/preset-typescript babel-plugin-root-import
+  # @babel/cli
+  # @babel/core
+  # @babel/preset-env
+  # @babel/preset-typescript
+  # babel-plugin-root-import
+  ```
 
+- express, body-parse, mongoose
+
+  ```bash
+  npm i express body-parser mongoose
+  ```
+
+- 声明文件(node, express)
+
+  ```bash
+  npm i -D @types/node @types/express
+  # @types/node
+  # @types/express
+  ```
+
+### 编辑配置文件
+
+- `.gitignore`
+- `.eslintrc.js` 直接拷贝
+- `.eslintignore`
+- `tsconfig.json`
 - `babel.config.json`
-
-```json
-{
-  "plugins": [
-    [
-      "babel-plugin-root-import",
-      {
-        "rootPathSuffix": "src",
-        "rootPathPrefix": "@"
-      }
-    ]
-  ],
-  "presets": [
-    "@babel/preset-env",
-    "@babel/preset-typescript"
-  ]
-}
-```
+- `package.json` 中的脚本
