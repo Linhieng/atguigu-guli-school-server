@@ -47,3 +47,14 @@ npm init @eslint/config
 - `tsconfig.json`
 - `babel.config.json`
 - `package.json` 中的脚本
+
+### 对脚本进行一些说明
+
+因为项目是使用 ts 搭建的后台, 所以脚本不是简单的 `node index.js`。
+用 ts 搭建后, 基本的处理步骤有三步:
+
+  1. 通过 `tsc` 将 ts 文件编译成 js 文件
+  2. 通过 `babel` 将编译后的 js 文件向下兼容
+  3. 通过 `nodemon` 执行 js 文件
+
+

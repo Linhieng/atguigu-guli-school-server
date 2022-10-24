@@ -1,22 +1,23 @@
-import express, { Request, Response, NextFunction } from 'express'
+import express from 'express'
 import http from 'http'
-import todoRoutes from '@/routes/todo'
+import teacherRoutes from './routes/teacher'
 import { json } from 'body-parser'
 
+import init from './init/globalVas'
+import globalError from './init/globalError'
+import connectDB from './config/connect'
+
+init()
+connectDB()
+
 const app = express()
-const PORT = 8080
+const PORT = 8001
 
 app.use(json())
-app.use('/todos', todoRoutes)
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (!err) {
-    next()
-  }
-  res
-    .status(500)
-    .json({ message: err.message })
-})
+app.use('/eduservice/teacher', teacherRoutes)
+
+app.use(globalError)
 
 http
   .createServer(app)
