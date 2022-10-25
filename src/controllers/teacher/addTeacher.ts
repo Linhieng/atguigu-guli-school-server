@@ -89,11 +89,13 @@ const addTeacher: RequestHandler = async (req, res) => {
     result.message = '创建成功'
   } catch (e) {
     if (e instanceof ReadError) {
-      status = 403
+      status = 200
+      result.code = READ_ERROR
       result.message = e.message
       result.data = e.cause
     } else if (e instanceof Error.ValidationError) {
-      status = 403
+      status = 200
+      result.code = M_VALIDATION_ERROR
       result.message = e.name + ': ' + e.message
       result.data = e.errors
     } else {
