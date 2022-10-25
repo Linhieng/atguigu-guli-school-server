@@ -3,15 +3,19 @@ import http from 'http'
 import teacherRoutes from './routes/teacher'
 import { json } from 'body-parser'
 
-import init from './init/globalVas'
-import globalError from './init/globalError'
 import connectDB from './config/connect'
-
-init()
-connectDB()
+import initErrorObj from './init/errorObj'
+import initGlobalVas from './init/globalVas'
+import globalError from './middleware/globalError'
+import initLog from './init/initLog'
 
 const app = express()
 const PORT = 8001
+
+initLog(app)
+connectDB()
+initGlobalVas()
+initErrorObj()
 
 app.use(json())
 

@@ -25,10 +25,10 @@ npm init @eslint/config
   # babel-plugin-root-import
   ```
 
-- express, body-parse, mongoose
+- express, body-parse, mongoose, morgan, file-stream-rotator
 
   ```bash
-  npm i express body-parser mongoose
+  npm i express body-parser mongoose morgan file-stream-rotator
   ```
 
 - 声明文件(node, express)

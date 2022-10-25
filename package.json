@@ -3,13 +3,11 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "tsc": "tsc --noEmit --watch",
+    "tsc": "tsc --watch",
     "nodemon": "npx nodemon dist/app.js",
-    "sql:mongod": "mongod --dbpath \"C:/Users/soft/mongodb-win32-x86_64-windows-6.0.1/data/db/",
-    "sql:tsc -w": "cd sql && tsc -w",
-    "sql:node js": "cd sql && npx nodemon ./dist/index.js"
+    "mongod": "mongod --dbpath \"C:/Users/soft/mongodb-win32-x86_64-windows-6.0.1/data/db/"
   },
-  "keywords": [ ],
+  "keywords": [],
   "author": "Linhieng",
   "license": "ISC",
   "devDependencies": {
@@ -27,6 +25,8 @@
   "dependencies": {
     "body-parser": "^1.20.0",
     "express": "^4.18.1",
-    "mongoose": "^6.6.5"
+    "file-stream-rotator": "^0.6.1",
+    "mongoose": "^6.6.5",
+    "morgan": "^1.10.0"
   }
 }

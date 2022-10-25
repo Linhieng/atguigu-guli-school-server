@@ -4,9 +4,10 @@ export default (err: Error, req: Request, res: Response, next: NextFunction) => 
   if (!err) {
     next()
   }
+  console.error(err)
   const result: R = {
     success: false,
-    code: 20001,
+    code: ERROR,
     message: err.message,
     data: {},
   }

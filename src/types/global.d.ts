@@ -1,3 +1,6 @@
+declare module 'file-stream-rotator'
+declare module 'morgan'
+
 declare const SUCCESS = 20000 // 状态码: 成功
 declare const ERROR = 20001 // 状态码: 失败
 type StatusCode = (

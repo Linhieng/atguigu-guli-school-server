@@ -1,39 +1,30 @@
-import log from '../util/log'
 import { connect, connection } from 'mongoose'
 import config from './default.json'
-
-type TConfig = {
-  mongoURI: string,
-  connectTimeoutMS: number,
-  keepAliveInitialDelay: number,
-}
 
 const connectDB = () => {
 
   const { mongoURI, connectTimeoutMS, keepAliveInitialDelay }: TConfig = config
 
-  const connectFun = () => {
-    log('reading connect')
-    connect(mongoURI, { connectTimeoutMS, keepAlive: true, keepAliveInitialDelay })
-      .then(() => {
-        log(`Successfully connected to ${mongoURI}`)
-        return console.info('Successfully connected')
-      })
-      .catch(err => {
-        log('Error connecting to database: ' + (err as Error).message)
-        return process.exit(1)
-      })
+  const connectFun = async () => {
+    console.debug('reading connect')
+    try {
+      await connect(mongoURI, { connectTimeoutMS, keepAlive: true, keepAliveInitialDelay })
+      console.debug(`Successfully connected to ${mongoURI}`)
+    } catch (err) {
+      console.error('Error connecting to database: ' + (err as Error).message)
+      process.exit(1)
+    }
   }
   connectFun()
   connection.on('disconnected', connectFun)
   connection.on('close', () => {
-    log('connect close')
+    console.debug('connect close')
   })
   connection.on('error', () => {
-    log('connect error')
+    console.error('connect error')
   })
   connection.on('connected', () => {
-    log('connect connected')
+    console.log('Successfully connected')
   })
 
 }

@@ -1,5 +1,107 @@
-use guli;
-db.edu_chapters.insertMany([
+// import mongoose, { connect, model, Schema } from 'mongoose'
+const mongoose = require('mongoose')
+const { connect, model, Schema } = mongoose
+const db = await connect('mongodb://localhost:27017/guli_test')
+
+const edu_chapters = new Schema({
+  id: String, // 章节ID; 主键
+  course_id: String, // 课程ID; 外键 idx_course_id
+  title: String, // 章节名称
+  sort: { type: Number, default: 0 }, // 显示排序
+  gmt_create: Date, // 创建时间
+  gmt_modified: Date, // 更新时间
+})
+const edu_comments = new Schema({
+  id: String, // 讲师ID; 主键
+  course_id: { type: String, default: '' }, // 课程id; 外键 idx_course_id
+  teacher_id: { type: String, default: '' }, // 讲师id; 外键 idx_teacher_id
+  member_id: { type: String, default: '' }, // 会员id; 外键 idx_member_id
+  nickname: String, // 会员昵称
+  avatar: String, // 会员头像
+  content: String, // 评论内容
+  is_deleted: { type: Boolean, default: false }, // 逻辑删除
+  gmt_create: Date, // 创建时间
+  gmt_modified: Date, // 更新时间
+})
+const edu_courses = new Schema({
+  id: String, // 课程ID; 主键
+  teacher_id: String, // 课程讲师ID; 外键 idx_subject_id
+  subject_id: String, // 课程专业ID; 外键 idx_teacher_id
+  subject_parent_id: String, // 课程专业父级ID
+  title: String, // 课程标题; 外键 idx_title
+  price: mongoose.Decimal128/* {type: Number, default: 0.00} */, // ✨decimal(10,2) 课程销售价格，设置为 0 则可免费观看
+  lesson_num: { type: Number, default: 0 }, //  总课时
+  cover: String, //  课程封面图片路径
+  buy_count: { type: Number, default: 0 }, //  销售数量
+  view_count: { type: Number, default: 0 }, //  浏览数量
+  version: { type: Number, default: 1 }, //  乐观锁
+  status: { type: String, default: 'Draft' }, //  课程状态 Draft未发布  Normal已发布
+  is_deleted: { type: Boolean, default: false }, //  逻辑删除
+  gmt_create: Date, //  创建时间
+  gmt_modified: Date, //  更新时间
+})
+const edu_course_collects = new Schema({
+  id: String, // 收藏ID; 主键
+  course_id: String, // 课程讲师ID
+  member_id: { type: String, default: '' }, // 课程专业ID
+  is_deleted: { type: Boolean, default: false }, // 逻辑删除
+  gmt_create: Date, // 创建时间
+  gmt_modified: Date, // 更新时间
+})
+const edu_course_descriptions = new Schema({
+  id: String, // 课程ID; 主键
+  description: String, // 课程简介
+  gmt_create: Date, // 创建时间
+  gmt_modified: Date, // 更新时间
+})
+const edu_subjects = new Schema({
+  id: String, // 课程类别ID; 主键
+  title: String, // 类别名称
+  parent_id: {type: String, default: '0'}, // 父ID; 外键 idx_parent_id
+  sort: {type: Number, default: 0}, // 排序字段
+  gmt_create: Date, // 创建时间
+  gmt_modified: Date, // 更新时间
+})
+const edu_teachers = new Schema({
+  id: String, // 讲师ID; 主键
+  name: String, // 讲师姓名; 外键 uk_name
+  intro: { type: String, default: '' }, // 讲师简介
+  career: String, // 一句话说明讲师
+  level: Number, // 头衔 1高级讲师 2首席讲师
+  avatar: String, // 讲师头像
+  sort: { type: Number, default: 0 }, // 排序
+  is_deleted: { type: Boolean, default: false }, // 逻辑删除
+  gmt_create: Date, // 创建时间
+  gmt_modified: Date, // 更新时间
+})
+const edu_videos = new Schema({
+  id: String, // 视频ID; 主键
+  course_id: String, // 课程ID; 外键 idx_course_id
+  chapter_id: String, // 章节ID; 外键 idx_chapter_id
+  title: String, // 节点名称
+  video_source_id: String, // 云端视频资源
+  video_original_name: String, // 原始文件名称
+  sort: { type: Number, default: 0 }, // 排序字段
+  play_count: { type: Number, default: 0 }, // 播放次数
+  is_free: { type: Boolean, default: false }, // 是否可以试听
+  duration: { type: Number, default: 0 }, // 视频时长（秒）
+  status: { type: String, default: 'Empty' }, // Empty未上传 Transcoding转码中  Normal正常
+  size: { type: Number, default: 0 }, // 视频源文件大小（字节）
+  version: { type: Number, default: 1 }, // 乐观锁
+  gmt_create: Date, // 创建时间
+  gmt_modified: Date, // 更新时间
+})
+
+const Chapter = model('edu_chapters', edu_chapters)
+const Comment = model('edu_comments', edu_comments)
+const Course = model('edu_courses', edu_courses)
+const Course_collect = model('edu_course_collects', edu_course_collects)
+const Course_description = model('edu_course_descriptions', edu_course_descriptions)
+const Subjects = model('edu_subjects', edu_subjects)
+const Teacher = model('edu_teachers', edu_teachers)
+const Video = model('edu_videos', edu_videos)
+
+await Chapter.insertMany([
   {
     id: '1',
     course_id: '14',
@@ -72,7 +174,7 @@ db.edu_chapters.insertMany([
     gmt_modified: '2019-10-09 08:33:20',
   },
 ])
-db.edu_comment.insertMany([
+await Comment.insertMany([
   {
     id: '1194499162790211585',
     course_id: '1192252213659774977',
@@ -185,7 +287,7 @@ db.edu_comment.insertMany([
     gmt_modified: '2019-11-18 11:10:58'
   }
 ])
-db.edu_course.insertMany([
+await Course.insertMany([
   {
     id: '1192252213659774977',
     teacher_id: '1189389726308478977',
@@ -252,7 +354,7 @@ db.edu_course.insertMany([
     gmt_modified: '2019-11-18 11:14:52'
   }
 ])
-db.edu_cousre_collect.insertMany([
+await Course_collect.insertMany([
   {
     id: '1196269345666019330',
     course_id: '1192252213659774977',
@@ -262,7 +364,7 @@ db.edu_cousre_collect.insertMany([
     gmt_modified: '2019-11-18 11:30:12'
   }
 ])
-db.edu_course_description.insertMany([
+await Course_description.insertMany([
   {
     id: '1104870479077879809',
     description: '<p>11</p>',
@@ -290,7 +392,7 @@ db.edu_course_description.insertMany([
     gmt_modified: '2019-10-30 19:58:36'
   }
 ])
-db.edu_subject.insertMany([
+await Subjects.insertMany([
   {
     id: '1178214681118568449',
     title: '后端开发',
@@ -447,7 +549,7 @@ db.edu_subject.insertMany([
     gmt_modified: '2019-09-30 16:19:22'
   }
 ])
-db.edu_teacher.insertMany([
+await Teacher.insertMany([
   {
     id: '1',
     name: '张三',
@@ -538,7 +640,7 @@ db.edu_teacher.insertMany([
     gmt_modified: '2019-11-15 21:47:27'
   }
 ])
-db.edu_video.insertMany([
+await Video.insertMany([
   {
     id: '1182499307429339137',
     course_id: '18',
@@ -765,3 +867,5 @@ db.edu_video.insertMany([
     gmt_modified: '2019-10-11 09:20:09'
   }
 ])
+
+db.disconnect()

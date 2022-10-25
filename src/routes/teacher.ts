@@ -1,14 +1,14 @@
 import { Router } from 'express'
-// @ts-ignore: 暂时忽略
-import { getAll, page, get, pageWithCondition, add, update, del } from '../controllers/teacher'
+import addTeacher from '../controllers/teacher/addTeacher'
+import getAllTeacher from '../controllers/teacher/getAllTeacher'
 
 const router = Router()
 
-router.get('/findAll', getAll)
+router.get('/findAll', getAllTeacher)
 // router.get('/pageTeacher/:current/:limit', page)
 // router.get('/getTeacher/:id', get)
 // router.post('/pageTeacherCondition/:current/:limit', pageWithCondition)
-// router.post('/addTeacher', add)
+router.post('/addTeacher', addTeacher)
 // router.post('/updateTeacher', update)
 // router.delete('/:id', del)
 
