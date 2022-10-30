@@ -9,11 +9,10 @@ export function formatNum (n: number | string, digit = 2): string {
 export function formatDate (date: Date, format?: string): string {
   const year = date.getFullYear()
   const mon = formatNum((date.getMonth() + 1))
-  const day = formatNum((date.getDay()))
+  const day = formatNum((date.getDate()))
   const h = formatNum((date.getHours()))
   const m = formatNum((date.getMinutes()))
   const s = formatNum((date.getSeconds()))
 
-  if (format === undefined) return `${year}-${mon}-${day} ${h}:${m}:${s}`
   return `${year}-${mon}-${day} ${h}:${m}:${s}`
 }
