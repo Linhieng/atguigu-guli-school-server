@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { Types, Error } from 'mongoose'
 import { EduTeacher } from '../../models/teacher'
-import { factoryR } from '../func'
+import { checkRequired, checkSyntax, factoryR } from '../func'
 
 type Teacher = {
   name: string,
@@ -21,24 +21,10 @@ const teacherProp = {
   avatar: 'string',
 }
 
-function checkPropRequired (teacher: Record<string, unknown>) {
-  Object.keys(teacherProp).forEach(prop => {
-    if (Object.prototype.hasOwnProperty.call(teacher, prop) === false) {
-      throw new PropertyRequiredError(prop)
-    }
-  })
-}
-function checkSyntax (teacher: Record<string, unknown>) {
-  Object.keys(teacherProp).forEach((prop) => {
-    if (typeof teacher[prop] !== teacherProp[(prop as keyof Teacher)]) {
-      throw new PropertySyntaxError(prop)
-    }
-  })
-}
-function checkTeacher (body: Record<string, unknown>) {
+function checkTeacher (teacher: Record<string, unknown>) {
   try {
-    checkPropRequired(body)
-    checkSyntax(body)
+    checkRequired(teacher, teacherProp)
+    checkSyntax(teacher, teacherProp)
   } catch (e) {
     if (e instanceof PropertyRequiredError) {
       throw new ReadError('缺少必要参数', {
