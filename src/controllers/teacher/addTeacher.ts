@@ -9,7 +9,7 @@ type Teacher = {
   level: number,
   career: string,
   intro: string,
-  avatar?: string,
+  avatar: string,
 }
 
 const teacherProp = {
@@ -18,7 +18,7 @@ const teacherProp = {
   level: 'number',
   career: 'string',
   intro: 'string',
-  // avatar: 'string',
+  avatar: 'string',
 }
 
 function checkTeacher (teacher: Record<string, unknown>) {

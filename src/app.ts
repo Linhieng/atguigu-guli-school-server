@@ -10,6 +10,7 @@ import initErrorObj from './init/errorObj'
 import initGlobalVas from './init/globalVas'
 import globalError from './middleware/globalError'
 import initLog from './init/initLog'
+import eduossRoutes from './routes/eduossRoutes'
 
 const app = express()
 const PORT = 8001
@@ -24,6 +25,7 @@ app.use(cors())
 
 app.use('/eduservice/user', userRoutes)
 app.use('/eduservice/teacher', teacherRoutes)
+app.use('/eduoss', eduossRoutes)
 
 app.use(globalError)
 

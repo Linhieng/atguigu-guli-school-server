@@ -16,3 +16,7 @@ export function formatDate (date: Date, format?: string): string {
 
   return `${year}-${mon}-${day} ${h}:${m}:${s}`
 }
+
+export function onlyOne (): string {
+  return new Date().getTime() + String(Math.random()).substring(2, 5)
+}
