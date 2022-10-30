@@ -19,4 +19,8 @@ export default function initGlobalVas () {
     value: 20004,
     writable: false,
   })
+  Object.defineProperty(globalThis, 'M_CAST_ERROR', {
+    value: 20005,
+    writable: false,
+  })
 }

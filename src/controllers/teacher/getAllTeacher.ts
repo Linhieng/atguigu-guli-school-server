@@ -7,13 +7,14 @@ const getAllTeacher: RequestHandler = async (req, res) => {
   let status = 500
 
   try {
-    result.data = await EduTeacher.find({})
+    result.data = await EduTeacher.find({ is_deleted: false })
 
     status = 200
     result.success = true
     result.code = SUCCESS
     result.message = '请求成功'
   } catch (e) {
+    console.error(e)
     // TODO: find 可能会抛出异常
     result.message = (e as Error).name + ': ' + (e as Error).message
   }

@@ -74,6 +74,7 @@ const addTeacher: RequestHandler = async (req, res) => {
     result.code = SUCCESS
     result.message = '创建成功'
   } catch (e) {
+    console.error(e)
     if (e instanceof ReadError) {
       status = 200
       result.code = READ_ERROR

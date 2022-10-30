@@ -92,7 +92,10 @@ async function findData (params: Params, query: QueryProp): Promise<ResData> {
   const end = start + params.limit
 
   const accord = await EduTeacher
-    .find(query)
+    .find({
+      ...query,
+      is_deleted: false,
+    })
     .lean() as Array<IEduTeacher>
   const total = accord.length
   const rows = accord.slice(start, end)
@@ -123,13 +126,13 @@ const getPageTeacherByQuery: RequestHandler = async (req, res) => {
     result.code = SUCCESS
     result.message = '请求成功'
   } catch (e) {
+    console.error(e)
     if (e instanceof ReadError) {
       status = 200
       result.code = READ_ERROR
       result.message = e.message
       result.data = e.cause
     }/* else if (e instanceof CastError) { } */else {
-      console.error(e)
       result.message = (e as Error).name + ': ' + (e as Error).message
     }
   }
