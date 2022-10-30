@@ -15,17 +15,18 @@ export function checkRequired (data: Record<string, unknown>, requiredProp: Reco
   })
 }
 
-export function checkSyntax(data: Record<string, unknown>, dataType: Record<string, string>) {
-    Object.keys(data).forEach((prop) => {
-      if (dataType[prop] === 'number') {
-        if (isNaN(Number(data[prop]))) {
-          data[prop] = undefined
-        } else {
-          data[prop] = Number(data[prop])
-        }
+export function checkSyntax (data: Record<string, unknown>, dataType: Record<string, string>) {
+  // 允许这种情况的存在: 有时候数字, 被变成字符串, 比如 params 中的数字
+  Object.keys(data).forEach((prop) => {
+    if (dataType[prop] === 'number') {
+      if (isNaN(Number(data[prop]))) {
+        data[prop] = undefined
+      } else {
+        data[prop] = Number(data[prop])
       }
-      if (typeof data[prop] !== dataType[prop]) {
-        throw new PropertySyntaxError(prop)
-      }
-    })
+    }
+    if (typeof data[prop] !== dataType[prop]) {
+      throw new PropertySyntaxError(prop)
+    }
+  })
 }
