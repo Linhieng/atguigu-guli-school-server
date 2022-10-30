@@ -1,30 +1,34 @@
 import { RequestHandler } from 'express'
-import { Types, Error } from 'mongoose'
+import { Types, Error, Schema } from 'mongoose'
 import { EduTeacher } from '../../models/teacher'
 import { checkRequired, checkSyntax, factoryR } from '../func'
 
 type Teacher = {
+  id: string,
   name: string,
   sort: number,
   level: number,
   career: string,
   intro: string,
-  avatar?: string,
+  avatar: string,
 }
 
 const teacherProp = {
+  id: 'string',
   name: 'string',
   sort: 'number',
   level: 'number',
   career: 'string',
   intro: 'string',
-  // avatar: 'string',
+  avatar: 'string',
 }
 
-function checkTeacher (teacher: Record<string, unknown>) {
+const canUpdate = ['name', 'sort', 'level', 'career', 'intro', 'avatar']
+
+function checkData (body: Teacher) {
   try {
-    checkRequired(teacher, teacherProp)
-    checkSyntax(teacher, teacherProp)
+    checkRequired(body, teacherProp)
+    checkSyntax(body, teacherProp)
   } catch (e) {
     if (e instanceof PropertyRequiredError) {
       throw new ReadError('缺少必要参数', {
@@ -44,35 +48,33 @@ function checkTeacher (teacher: Record<string, unknown>) {
   }
 }
 
-async function add (data: Teacher) {
-  const teacher: IEduTeacher = {
-    id: new Types.ObjectId(),
-    name: data.name,
-    sort: data.sort,
-    level: data.level,
-    career: data.career,
-    intro: data.intro,
-    avatar: data.avatar === '' ? undefined : data.avatar,
-    is_deleted: false,
-    gmt_create: new Date(),
-    gmt_modified: undefined,
-  }
-  const dTeacher = new EduTeacher(teacher)
-  await dTeacher.save()
+async function update (body: Teacher) {
+  const newData: Record<string, any> = {}
+  canUpdate.forEach(item => {
+    newData[item] = body[(item as keyof Teacher)]
+  })
+  newData.gmt_modified = new Date()
+  await EduTeacher
+    .findOneAndUpdate({
+      id: new Types.ObjectId(body.id),
+      is_deleted: false,
+    }, newData)
 }
 
-const addTeacher: RequestHandler = async (req, res) => {
+const updateTeacher: RequestHandler = async (req, res) => {
   const result = factoryR()
   let status = 500
 
   try {
-    checkTeacher(req.body)
-    await add(req.body)
+    const body = req.body as unknown as Teacher
+
+    checkData(body)
+    await update(body)
 
     status = 200
     result.success = true
     result.code = SUCCESS
-    result.message = '创建成功'
+    result.message = '成功'
   } catch (e) {
     console.error(e)
     if (e instanceof ReadError) {
@@ -80,11 +82,17 @@ const addTeacher: RequestHandler = async (req, res) => {
       result.code = READ_ERROR
       result.message = e.message
       result.data = e.cause
-    } else if (e instanceof Error.ValidationError) {
+    } else if (e instanceof Error.CastError) {
       status = 200
-      result.code = M_VALIDATION_ERROR
-      result.message = e.name + ': ' + e.message
-      result.data = e.errors
+      result.code = M_CAST_ERROR
+      result.message = e.message
+      result.data = {
+        name: e.name,
+        stringValue: e.stringValue,
+        kind: e.kind,
+        value: e.value,
+        path: e.path,
+      }
     } else {
       result.message = (e as Error).name + ': ' + (e as Error).message
     }
@@ -94,4 +102,5 @@ const addTeacher: RequestHandler = async (req, res) => {
     .status(status)
     .json(result)
 }
-export default addTeacher
+
+export default updateTeacher

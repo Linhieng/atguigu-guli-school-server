@@ -24,6 +24,8 @@ export function checkRequired (data: Record<string, unknown>, requiredProp: Reco
  */
 export function checkSyntax (data: Record<string, unknown>, dataType: Record<string, string>) {
   Object.keys(data).forEach((prop) => {
+    if (dataType[prop] === undefined) return
+
     if (dataType[prop] === 'number') {
 
       if (isNaN(Number(data[prop]))) {
