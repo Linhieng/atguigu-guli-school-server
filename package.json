@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "tsc": "tsc --watch",
-    "nodemon": "npx nodemon dist/app.js",
+    "nodemon": "npx nodemon dist/src/app.js",
     "mongod": "mongod --dbpath \"C:/Users/soft/mongodb-win32-x86_64-windows-6.0.1/data/db/"
   },
   "keywords": [],
