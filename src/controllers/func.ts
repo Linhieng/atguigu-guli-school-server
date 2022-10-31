@@ -50,3 +50,31 @@ export function checkSyntax (data: Record<string, unknown>, dataType: Record<str
     }
   })
 }
+
+export function checkFile (file?: Express.Multer.File) {
+  if (!(file?.buffer instanceof Buffer)) {
+    throw new ReadError('没有文件!', {})
+  }
+}
+
+/**
+ *
+ * @param file 必须是 File 类型
+ * @param mime 合法的 mimetype 前缀, 比如 image,
+ * @returns 返回 mimetype 的后缀, 比如 image/png 返回 png
+ */
+export function checkMimePrefix (file: Express.Multer.File, mime: MimeTypePrefix): string {
+  const mimetype = file.mimetype.split('/')
+  if (mimetype[0] !== mime) {
+    throw new SyntaxError(`请上传 ${mime} 类型的资源`)
+  }
+  return mimetype[1]
+}
+
+export function checkMime (file: Express.Multer.File, mimeArr: Array<string>, typeInfo?: string): string {
+  const mimetype = file.mimetype
+  if (!(mimeArr.includes(mimetype))) {
+    throw new SyntaxError(`请上传 ${typeInfo? typeInfo : mimetype} 类型的资源`)
+  }
+  return mimetype[1]
+}

@@ -1,21 +1,11 @@
 import { RequestHandler } from 'express'
-import { factoryR } from '../func'
+import { checkFile, checkMimePrefix, factoryR } from '../func'
 import OSS from 'ali-oss'
 import { onlyOne } from '../../util/base'
 import privateData from '../../../private.json'
 
-function checkFile (file?: Express.Multer.File) {
-  if (!(file?.buffer instanceof Buffer)) {
-    throw new ReadError('没有上传文件!', {})
-  }
-}
-
-function getSuffix (file: Express.Multer.File): string {
-  const mimetype = file.mimetype.split('/')
-  if (mimetype[0] !== 'image') {
-    throw new SyntaxError('只允许上传图片')
-  }
-  return mimetype[1]
+function checkAndGetSuffix (file: Express.Multer.File): string {
+  return checkMimePrefix(file, 'image')
 }
 
 async function updateOss (fileFullName: string, buffer: Buffer) {
@@ -41,7 +31,7 @@ const fileoss: RequestHandler = async (req, res) => {
   try {
 
     checkFile(req.file)
-    const suffix = getSuffix(req.file as Express.Multer.File)
+    const suffix = checkAndGetSuffix(req.file as Express.Multer.File)
     const url = await updateOss(onlyOne() + '.' + suffix, req.file!.buffer)
     result.data = { url }
 

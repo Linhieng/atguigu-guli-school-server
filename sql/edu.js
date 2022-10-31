@@ -5,6 +5,34 @@ const { connect, model, Schema, Types } = mongoose
 async function main () {
   const db = await connect('mongodb://localhost:27017/guli')
 
+  const edu_teachers = new Schema({
+    id: Schema.Types.ObjectId, // 讲师ID; 主键
+    name: String, // 讲师姓名; 外键 uk_name
+    intro: { type: String, default: '' }, // 讲师简介
+    career: String, // 一句话说明讲师
+    level: Number, // 头衔 1高级讲师 2首席讲师
+    avatar: String, // 讲师头像
+    sort: { type: Number, default: 0 }, // 排序
+    is_deleted: { type: Boolean, default: false }, // 逻辑删除
+    gmt_create: Date, // 创建时间
+    gmt_modified: Date, // 更新时间
+  })
+  const subjectChildren = new Schema({
+    id: { type: Schema.Types.ObjectId, required: true },
+    title: { type: String, required: true },
+    sort: { type: Number, default: 0 }, // 排序字段
+    gmt_create: Date, // 创建时间
+    gmt_modified: Date, // 更新时间
+  })
+  const edu_subjects = new Schema({
+    id: { type: Schema.Types.ObjectId, required: true },
+    title: { type: String, required: true },
+    children: { type: [subjectChildren], required: false },
+    sort: { type: Number, default: 0 }, // 排序字段
+    gmt_create: Date, // 创建时间
+    gmt_modified: Date, // 更新时间
+  })
+
   const edu_chapters = new Schema({
     id: Schema.Types.ObjectId, // 章节ID; 主键
     course_id: String, // 课程ID; 外键 idx_course_id
@@ -56,26 +84,6 @@ async function main () {
     gmt_create: Date, // 创建时间
     gmt_modified: Date, // 更新时间
   })
-  const edu_subjects = new Schema({
-    id: Schema.Types.ObjectId, // 课程类别ID; 主键
-    title: String, // 类别名称
-    parent_id: { type: String, default: '0' }, // 父ID; 外键 idx_parent_id
-    sort: { type: Number, default: 0 }, // 排序字段
-    gmt_create: Date, // 创建时间
-    gmt_modified: Date, // 更新时间
-  })
-  const edu_teachers = new Schema({
-    id: Schema.Types.ObjectId, // 讲师ID; 主键
-    name: String, // 讲师姓名; 外键 uk_name
-    intro: { type: String, default: '' }, // 讲师简介
-    career: String, // 一句话说明讲师
-    level: Number, // 头衔 1高级讲师 2首席讲师
-    avatar: String, // 讲师头像
-    sort: { type: Number, default: 0 }, // 排序
-    is_deleted: { type: Boolean, default: false }, // 逻辑删除
-    gmt_create: Date, // 创建时间
-    gmt_modified: Date, // 更新时间
-  })
   const edu_videos = new Schema({
     id: Schema.Types.ObjectId, // 视频ID; 主键
     course_id: String, // 课程ID; 外键 idx_course_id
@@ -94,463 +102,16 @@ async function main () {
     gmt_modified: Date, // 更新时间
   })
 
+  const Teacher = model('edu_teachers', edu_teachers)
+  const Subjects = model('edu_subjects', edu_subjects)
+
   const Chapter = model('edu_chapters', edu_chapters)
   const Comment = model('edu_comments', edu_comments)
   const Course = model('edu_courses', edu_courses)
   const Course_collect = model('edu_course_collects', edu_course_collects)
   const Course_description = model('edu_course_descriptions', edu_course_descriptions)
-  const Subjects = model('edu_subjects', edu_subjects)
-  const Teacher = model('edu_teachers', edu_teachers)
   const Video = model('edu_videos', edu_videos)
 
-  await Chapter.insertMany([
-    {
-     id: new Types.ObjectId(),
-      course_id: '14',
-      title: '第一章：HTML',
-      sort: 0,
-      gmt_create: '2019-01-01 12:27:40',
-      gmt_modified: '2019-01-01 12:55:30'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      title: '第一章节',
-      sort: 0,
-      gmt_create: '2019-11-07 09:28:25',
-      gmt_modified: '2019-11-07 09:28:25',
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '18',
-      title: '第一章：Java入门',
-      sort: 0,
-      gmt_create: '2019-01-01 12:27:40',
-      gmt_modified: '2019-10-09 09:13:19',
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '14',
-      title: '第二章：CSS',
-      sort: 0,
-      gmt_create: '2019-01-01 12:55:35',
-      gmt_modified: '2019-01-01 12:27:40',
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '18',
-      title: '第二章：控制台输入和输出',
-      sort: 0,
-      gmt_create: '2019-01-01 12:27:40',
-      gmt_modified: '2019-01-01 12:27:40',
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '18',
-      title: '第三章：控制流',
-      sort: 0,
-      gmt_create: '2019-01-01 12:27:40',
-      gmt_modified: '2019-01-01 12:27:40',
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '18',
-      title: '第四章：类的定义',
-      sort: 0,
-      gmt_create: '2019-01-01 12:27:40',
-      gmt_modified: '2019-01-01 12:27:40',
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '18',
-      title: '第五章：数组',
-      sort: 0,
-      gmt_create: '2019-01-01 12:27:40',
-      gmt_modified: '2019-01-01 12:27:40',
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '18',
-      title: '第六章：继承',
-      sort: 61,
-      gmt_create: '2019-01-01 12:27:40',
-      gmt_modified: '2019-10-09 08:32:47',
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '18',
-      title: '第七章：I/O流',
-      sort: 70,
-      gmt_create: '2019-10-09 08:32:58',
-      gmt_modified: '2019-10-09 08:33:20',
-    },
-  ])
-  await Comment.insertMany([
-    {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: '小三123',
-      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
-      content: '课程很好',
-      is_deleted: 0,
-      gmt_create: '2019-11-13 14:16:08',
-      gmt_modified: '2019-11-13 14:16:08'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: '小三123',
-      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
-      content: '11',
-      is_deleted: 0,
-      gmt_create: '2019-11-14 16:42:35',
-      gmt_modified: '2019-11-14 16:42:35'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: '小三123',
-      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
-      content: '111',
-      is_deleted: 0,
-      gmt_create: '2019-11-14 16:42:53',
-      gmt_modified: '2019-11-14 16:42:53'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: null,
-      avatar: null,
-      content: '2233',
-      is_deleted: 0,
-      gmt_create: '2019-11-15 16:03:45',
-      gmt_modified: '2019-11-15 16:03:45'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: null,
-      avatar: null,
-      content: '4455',
-      is_deleted: 0,
-      gmt_create: '2019-11-15 16:05:11',
-      gmt_modified: '2019-11-15 16:05:11'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: '小三1231',
-      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
-      content: '55',
-      is_deleted: 0,
-      gmt_create: '2019-11-15 16:10:53',
-      gmt_modified: '2019-11-15 16:10:53'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: '小三1231',
-      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
-      content: '55',
-      is_deleted: 0,
-      gmt_create: '2019-11-15 16:11:13',
-      gmt_modified: '2019-11-15 16:11:13'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: '小三1231',
-      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
-      content: '223344',
-      is_deleted: 0,
-      gmt_create: '2019-11-15 16:11:18',
-      gmt_modified: '2019-11-15 16:11:18'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '14',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: '小三1231',
-      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
-      content: '11',
-      is_deleted: 0,
-      gmt_create: '2019-11-15 16:47:53',
-      gmt_modified: '2019-11-15 16:47:53'
-    }, {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      teacher_id: '1189389726308478977',
-      member_id: '1',
-      nickname: '小三1231',
-      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
-      content: '666666',
-      is_deleted: 0,
-      gmt_create: '2019-11-18 11:10:58',
-      gmt_modified: '2019-11-18 11:10:58'
-    }
-  ])
-  await Course.insertMany([
-    {
-     id: new Types.ObjectId(),
-      teacher_id: '1189389726308478977',
-      subject_id: '1178214681139539969',
-      subject_parent_id: '1178214681118568449',
-      title: 'java基础课程：test',
-      price: 0.01,
-      lesson_num: 2,
-      cover: 'https://guli-file-190513.oss-cn-beijing.aliyuncs.com/cover/default.gif',
-      buy_count: 4,
-      view_count: 387,
-      version: 1,
-      status: 'Normal',
-      is_deleted: 0,
-      gmt_create: '2019-11-07 09:27:33',
-      gmt_modified: '2019-11-18 13:35:03'
-    }, {
-     id: new Types.ObjectId(),
-      teacher_id: '1189389726308478977',
-      subject_id: '1101348944971091969',
-      subject_parent_id: '1101348944920760321',
-      title: 'XHTML CSS2 JS整站制作教程课程学习',
-      price: 0.00,
-      lesson_num: 3,
-      cover: 'http://guli-file.oss-cn-beijing.aliyuncs.com/cover/2019/03/13/d0086eb0-f2dc-45f7-bba1-744d95e5be0f.jpg',
-      buy_count: 3,
-      view_count: 44,
-      version: 15,
-      status: 'Normal',
-      is_deleted: 0,
-      gmt_create: '2018-04-02 18:33:34',
-      gmt_modified: '2019-11-16 21:21:45'
-    }, {
-     id: new Types.ObjectId(),
-      teacher_id: '1189389726308478977',
-      subject_id: '1101348944971091969',
-      subject_parent_id: '1101348944920760321',
-      title: 'HTML5入门课程学习',
-      price: 0.00,
-      lesson_num: 23,
-      cover: 'http://guli-file.oss-cn-beijing.aliyuncs.com/cover/2019/03/13/22997b8e-3606-4d2e-9b4f-09f48418b6e4.jpg',
-      buy_count: 0,
-      view_count: 51,
-      version: 17,
-      status: 'Normal',
-      is_deleted: 0,
-      gmt_create: '2018-04-02 18:34:32',
-      gmt_modified: '2019-11-12 10:19:20'
-    }, {
-     id: new Types.ObjectId(),
-      teacher_id: '1189389726308478977',
-      subject_id: '1178214681139539969',
-      subject_parent_id: '1178214681118568449',
-      title: 'Java精品课程',
-      price: 0.01,
-      lesson_num: 20,
-      cover: 'http://guli-file.oss-cn-beijing.aliyuncs.com/cover/2019/03/06/866e9aca-b530-4f71-a690-72d4a4bfd1e7.jpg',
-      buy_count: 151,
-      view_count: 737,
-      version: 6,
-      status: 'Normal',
-      is_deleted: 0,
-      gmt_create: '2018-04-02 21:28:46',
-      gmt_modified: '2019-11-18 11:14:52'
-    }
-  ])
-  await Course_collect.insertMany([
-    {
-     id: new Types.ObjectId(),
-      course_id: '1192252213659774977',
-      member_id: '1',
-      is_deleted: 1,
-      gmt_create: '2019-11-18 11:30:12',
-      gmt_modified: '2019-11-18 11:30:12'
-    }
-  ])
-  await Course_description.insertMany([
-    {
-     id: new Types.ObjectId(),
-      description: '<p>11</p>',
-      gmt_create: '2019-03-11 06:23:44',
-      gmt_modified: '2019-03-11 06:23:44'
-    }, {
-     id: new Types.ObjectId(),
-      description: '<p>测试</p>',
-      gmt_create: '2019-11-07 09:27:33',
-      gmt_modified: '2019-11-13 16:21:28'
-    }, {
-     id: new Types.ObjectId(),
-      description: '',
-      gmt_create: '2019-03-13 06:04:43',
-      gmt_modified: '2019-03-13 06:05:33'
-    }, {
-     id: new Types.ObjectId(),
-      description: '',
-      gmt_create: '2019-03-13 06:03:33',
-      gmt_modified: '2019-03-13 06:04:22'
-    }, {
-     id: new Types.ObjectId(),
-      description: '<p>本套Java视频完全针对零基础学员，课堂实录，自发布以来，好评如潮！Java视频中注重与学生互动，讲授幽默诙谐、细致入微，覆盖Java基础所有核心知识点，同类Java视频中也是代码量大、案例多、实战性强的。同时，本Java视频教程注重技术原理剖析，深入JDK源码，辅以代码实战贯穿始终，用实践驱动理论，并辅以必要的代码练习。</p>\n<p>------------------------------------</p>\n<p>视频特点：</p>\n<p>通过学习本Java视频教程，大家能够真正将Java基础知识学以致用、活学活用，构架Java编程思想，牢牢掌握\"源码级\"的Javase核心技术，并为后续JavaWeb等技术的学习奠定扎实基础。<br /><br />1.通俗易懂，细致入微：每个知识点高屋建瓴，深入浅出，简洁明了的说明问题<br />2.具实战性：全程真正代码实战，涵盖上百个企业应用案例及练习<br />3.深入：源码分析，更有 Java 反射、动态代理的实际应用等<br />4.登录尚硅谷官网，技术讲师免费在线答疑</p>',
-      gmt_create: '2019-03-06 18:06:36',
-      gmt_modified: '2019-10-30 19:58:36'
-    }
-  ])
-  await Subjects.insertMany([
-    {
-     id: new Types.ObjectId(),
-      title: '后端开发',
-      parent_id: '0',
-      sort: 1,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Java',
-      parent_id: '1178214681118568449',
-      sort: 1,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: '前端开发',
-      parent_id: '0',
-      sort: 3,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'JavaScript',
-      parent_id: '1178214681181483010',
-      sort: 4,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: '云计算',
-      parent_id: '0',
-      sort: 5,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Docker',
-      parent_id: '1178214681231814658',
-      sort: 5,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Linux',
-      parent_id: '1178214681231814658',
-      sort: 6,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: '系统/运维',
-      parent_id: '0',
-      sort: 7,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Linux',
-      parent_id: '1178214681324089345',
-      sort: 7,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Windows',
-      parent_id: '1178214681324089345',
-      sort: 8,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: '数据库',
-      parent_id: '0',
-      sort: 9,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'MySQL',
-      parent_id: '1178214681399586817',
-      sort: 9,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'MongoDB',
-      parent_id: '1178214681399586817',
-      sort: 10,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: '大数据',
-      parent_id: '0',
-      sort: 11,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Hadoop',
-      parent_id: '1178214681483472898',
-      sort: 11,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Spark',
-      parent_id: '1178214681483472898',
-      sort: 12,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: '人工智能',
-      parent_id: '0',
-      sort: 13,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Python',
-      parent_id: '1178214681554776066',
-      sort: 13,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: '编程语言',
-      parent_id: '0',
-      sort: 14,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Java',
-      parent_id: '1178214681613496321',
-      sort: 14,
-      gmt_create: '2019-09-29 15:47:25',
-      gmt_modified: '2019-09-29 15:47:25'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'Python',
-      parent_id: '1178214681118568449',
-      sort: 2,
-      gmt_create: '2019-09-30 16:19:22',
-      gmt_modified: '2019-09-30 16:19:22'
-    }, {
-     id: new Types.ObjectId(),
-      title: 'HTML/CSS',
-      parent_id: '1178214681181483010',
-      sort: 3,
-      gmt_create: '2019-09-30 16:19:22',
-      gmt_modified: '2019-09-30 16:19:22'
-    }
-  ])
   await Teacher.insertMany([
     {
       id: new Types.ObjectId(),
@@ -642,9 +203,444 @@ async function main () {
       gmt_modified: '2019-11-15 21:47:27'
     }
   ])
+  await Subjects.insertMany([
+    {
+      id: new Types.ObjectId(),
+      title: '后端开发',
+      children: [{
+        id: new Types.ObjectId(),
+        title: 'Java',
+        sort: 1,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }],
+      sort: 1,
+      gmt_create: '2019-09-29 15:47:25',
+      gmt_modified: '2019-09-29 15:47:25'
+    }, {
+      id: new Types.ObjectId(),
+      title: '前端开发',
+      children: [{
+        id: new Types.ObjectId(),
+        title: 'JavaScript',
+        sort: 4,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }],
+      sort: 3,
+      gmt_create: '2019-09-29 15:47:25',
+      gmt_modified: '2019-09-29 15:47:25'
+    }, {
+      id: new Types.ObjectId(),
+      title: '云计算',
+      children: [{
+        id: new Types.ObjectId(),
+        title: 'Docker',
+        sort: 5,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }, {
+        id: new Types.ObjectId(),
+        title: 'Linux',
+        sort: 6,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }],
+      sort: 5,
+      gmt_create: '2019-09-29 15:47:25',
+      gmt_modified: '2019-09-29 15:47:25'
+    }, {
+      id: new Types.ObjectId(),
+      title: '系统/运维',
+      children: [{
+        id: new Types.ObjectId(),
+        title: 'Linux',
+        sort: 7,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }, {
+        id: new Types.ObjectId(),
+        title: 'Windows',
+        sort: 8,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }],
+      sort: 7,
+      gmt_create: '2019-09-29 15:47:25',
+      gmt_modified: '2019-09-29 15:47:25'
+    }, {
+      id: new Types.ObjectId(),
+      title: '数据库',
+      children: [{
+        id: new Types.ObjectId(),
+        title: 'MySQL',
+        sort: 9,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }, {
+        id: new Types.ObjectId(),
+        title: 'MongoDB',
+        sort: 10,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }],
+      sort: 9,
+      gmt_create: '2019-09-29 15:47:25',
+      gmt_modified: '2019-09-29 15:47:25'
+    }, {
+      id: new Types.ObjectId(),
+      title: '大数据',
+      children: [{
+        id: new Types.ObjectId(),
+        title: 'Hadoop',
+        sort: 11,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }, {
+        id: new Types.ObjectId(),
+        title: 'Spark',
+        sort: 12,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }],
+      sort: 11,
+      gmt_create: '2019-09-29 15:47:25',
+      gmt_modified: '2019-09-29 15:47:25'
+    }, {
+      id: new Types.ObjectId(),
+      title: '人工智能',
+      children: [{
+        id: new Types.ObjectId(),
+        title: 'Python',
+        sort: 13,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }],
+      sort: 13,
+      gmt_create: '2019-09-29 15:47:25',
+      gmt_modified: '2019-09-29 15:47:25'
+    }, {
+      id: new Types.ObjectId(),
+      title: '编程语言',
+      children: [{
+        id: new Types.ObjectId(),
+        title: 'Java',
+        sort: 14,
+        gmt_create: '2019-09-29 15:47:25',
+        gmt_modified: '2019-09-29 15:47:25'
+      }, {
+        id: new Types.ObjectId(),
+        title: 'Python',
+        sort: 2,
+        gmt_create: '2019-09-30 16:19:22',
+        gmt_modified: '2019-09-30 16:19:22'
+      }, {
+        id: new Types.ObjectId(),
+        title: 'HTML/CSS',
+        sort: 3,
+        gmt_create: '2019-09-30 16:19:22',
+        gmt_modified: '2019-09-30 16:19:22'
+      }],
+      sort: 14,
+      gmt_create: '2019-09-29 15:47:25',
+      gmt_modified: '2019-09-29 15:47:25'
+    }
+  ])
+
+  await Chapter.insertMany([
+    {
+      id: new Types.ObjectId(),
+      course_id: '14',
+      title: '第一章：HTML',
+      sort: 0,
+      gmt_create: '2019-01-01 12:27:40',
+      gmt_modified: '2019-01-01 12:55:30'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      title: '第一章节',
+      sort: 0,
+      gmt_create: '2019-11-07 09:28:25',
+      gmt_modified: '2019-11-07 09:28:25',
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '18',
+      title: '第一章：Java入门',
+      sort: 0,
+      gmt_create: '2019-01-01 12:27:40',
+      gmt_modified: '2019-10-09 09:13:19',
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '14',
+      title: '第二章：CSS',
+      sort: 0,
+      gmt_create: '2019-01-01 12:55:35',
+      gmt_modified: '2019-01-01 12:27:40',
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '18',
+      title: '第二章：控制台输入和输出',
+      sort: 0,
+      gmt_create: '2019-01-01 12:27:40',
+      gmt_modified: '2019-01-01 12:27:40',
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '18',
+      title: '第三章：控制流',
+      sort: 0,
+      gmt_create: '2019-01-01 12:27:40',
+      gmt_modified: '2019-01-01 12:27:40',
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '18',
+      title: '第四章：类的定义',
+      sort: 0,
+      gmt_create: '2019-01-01 12:27:40',
+      gmt_modified: '2019-01-01 12:27:40',
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '18',
+      title: '第五章：数组',
+      sort: 0,
+      gmt_create: '2019-01-01 12:27:40',
+      gmt_modified: '2019-01-01 12:27:40',
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '18',
+      title: '第六章：继承',
+      sort: 61,
+      gmt_create: '2019-01-01 12:27:40',
+      gmt_modified: '2019-10-09 08:32:47',
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '18',
+      title: '第七章：I/O流',
+      sort: 70,
+      gmt_create: '2019-10-09 08:32:58',
+      gmt_modified: '2019-10-09 08:33:20',
+    },
+  ])
+  await Comment.insertMany([
+    {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: '小三123',
+      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
+      content: '课程很好',
+      is_deleted: 0,
+      gmt_create: '2019-11-13 14:16:08',
+      gmt_modified: '2019-11-13 14:16:08'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: '小三123',
+      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
+      content: '11',
+      is_deleted: 0,
+      gmt_create: '2019-11-14 16:42:35',
+      gmt_modified: '2019-11-14 16:42:35'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: '小三123',
+      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
+      content: '111',
+      is_deleted: 0,
+      gmt_create: '2019-11-14 16:42:53',
+      gmt_modified: '2019-11-14 16:42:53'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: null,
+      avatar: null,
+      content: '2233',
+      is_deleted: 0,
+      gmt_create: '2019-11-15 16:03:45',
+      gmt_modified: '2019-11-15 16:03:45'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: null,
+      avatar: null,
+      content: '4455',
+      is_deleted: 0,
+      gmt_create: '2019-11-15 16:05:11',
+      gmt_modified: '2019-11-15 16:05:11'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: '小三1231',
+      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
+      content: '55',
+      is_deleted: 0,
+      gmt_create: '2019-11-15 16:10:53',
+      gmt_modified: '2019-11-15 16:10:53'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: '小三1231',
+      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
+      content: '55',
+      is_deleted: 0,
+      gmt_create: '2019-11-15 16:11:13',
+      gmt_modified: '2019-11-15 16:11:13'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: '小三1231',
+      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
+      content: '223344',
+      is_deleted: 0,
+      gmt_create: '2019-11-15 16:11:18',
+      gmt_modified: '2019-11-15 16:11:18'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '14',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: '小三1231',
+      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
+      content: '11',
+      is_deleted: 0,
+      gmt_create: '2019-11-15 16:47:53',
+      gmt_modified: '2019-11-15 16:47:53'
+    }, {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      teacher_id: '1189389726308478977',
+      member_id: '1',
+      nickname: '小三1231',
+      avatar: 'http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132',
+      content: '666666',
+      is_deleted: 0,
+      gmt_create: '2019-11-18 11:10:58',
+      gmt_modified: '2019-11-18 11:10:58'
+    }
+  ])
+  await Course.insertMany([
+    {
+      id: new Types.ObjectId(),
+      teacher_id: '1189389726308478977',
+      subject_id: '1178214681139539969',
+      subject_parent_id: '1178214681118568449',
+      title: 'java基础课程：test',
+      price: 0.01,
+      lesson_num: 2,
+      cover: 'https://guli-file-190513.oss-cn-beijing.aliyuncs.com/cover/default.gif',
+      buy_count: 4,
+      view_count: 387,
+      version: 1,
+      status: 'Normal',
+      is_deleted: 0,
+      gmt_create: '2019-11-07 09:27:33',
+      gmt_modified: '2019-11-18 13:35:03'
+    }, {
+      id: new Types.ObjectId(),
+      teacher_id: '1189389726308478977',
+      subject_id: '1101348944971091969',
+      subject_parent_id: '1101348944920760321',
+      title: 'XHTML CSS2 JS整站制作教程课程学习',
+      price: 0.00,
+      lesson_num: 3,
+      cover: 'http://guli-file.oss-cn-beijing.aliyuncs.com/cover/2019/03/13/d0086eb0-f2dc-45f7-bba1-744d95e5be0f.jpg',
+      buy_count: 3,
+      view_count: 44,
+      version: 15,
+      status: 'Normal',
+      is_deleted: 0,
+      gmt_create: '2018-04-02 18:33:34',
+      gmt_modified: '2019-11-16 21:21:45'
+    }, {
+      id: new Types.ObjectId(),
+      teacher_id: '1189389726308478977',
+      subject_id: '1101348944971091969',
+      subject_parent_id: '1101348944920760321',
+      title: 'HTML5入门课程学习',
+      price: 0.00,
+      lesson_num: 23,
+      cover: 'http://guli-file.oss-cn-beijing.aliyuncs.com/cover/2019/03/13/22997b8e-3606-4d2e-9b4f-09f48418b6e4.jpg',
+      buy_count: 0,
+      view_count: 51,
+      version: 17,
+      status: 'Normal',
+      is_deleted: 0,
+      gmt_create: '2018-04-02 18:34:32',
+      gmt_modified: '2019-11-12 10:19:20'
+    }, {
+      id: new Types.ObjectId(),
+      teacher_id: '1189389726308478977',
+      subject_id: '1178214681139539969',
+      subject_parent_id: '1178214681118568449',
+      title: 'Java精品课程',
+      price: 0.01,
+      lesson_num: 20,
+      cover: 'http://guli-file.oss-cn-beijing.aliyuncs.com/cover/2019/03/06/866e9aca-b530-4f71-a690-72d4a4bfd1e7.jpg',
+      buy_count: 151,
+      view_count: 737,
+      version: 6,
+      status: 'Normal',
+      is_deleted: 0,
+      gmt_create: '2018-04-02 21:28:46',
+      gmt_modified: '2019-11-18 11:14:52'
+    }
+  ])
+  await Course_collect.insertMany([
+    {
+      id: new Types.ObjectId(),
+      course_id: '1192252213659774977',
+      member_id: '1',
+      is_deleted: 1,
+      gmt_create: '2019-11-18 11:30:12',
+      gmt_modified: '2019-11-18 11:30:12'
+    }
+  ])
+  await Course_description.insertMany([
+    {
+      id: new Types.ObjectId(),
+      description: '<p>11</p>',
+      gmt_create: '2019-03-11 06:23:44',
+      gmt_modified: '2019-03-11 06:23:44'
+    }, {
+      id: new Types.ObjectId(),
+      description: '<p>测试</p>',
+      gmt_create: '2019-11-07 09:27:33',
+      gmt_modified: '2019-11-13 16:21:28'
+    }, {
+      id: new Types.ObjectId(),
+      description: '',
+      gmt_create: '2019-03-13 06:04:43',
+      gmt_modified: '2019-03-13 06:05:33'
+    }, {
+      id: new Types.ObjectId(),
+      description: '',
+      gmt_create: '2019-03-13 06:03:33',
+      gmt_modified: '2019-03-13 06:04:22'
+    }, {
+      id: new Types.ObjectId(),
+      description: '<p>本套Java视频完全针对零基础学员，课堂实录，自发布以来，好评如潮！Java视频中注重与学生互动，讲授幽默诙谐、细致入微，覆盖Java基础所有核心知识点，同类Java视频中也是代码量大、案例多、实战性强的。同时，本Java视频教程注重技术原理剖析，深入JDK源码，辅以代码实战贯穿始终，用实践驱动理论，并辅以必要的代码练习。</p>\n<p>------------------------------------</p>\n<p>视频特点：</p>\n<p>通过学习本Java视频教程，大家能够真正将Java基础知识学以致用、活学活用，构架Java编程思想，牢牢掌握\"源码级\"的Javase核心技术，并为后续JavaWeb等技术的学习奠定扎实基础。<br /><br />1.通俗易懂，细致入微：每个知识点高屋建瓴，深入浅出，简洁明了的说明问题<br />2.具实战性：全程真正代码实战，涵盖上百个企业应用案例及练习<br />3.深入：源码分析，更有 Java 反射、动态代理的实际应用等<br />4.登录尚硅谷官网，技术讲师免费在线答疑</p>',
+      gmt_create: '2019-03-06 18:06:36',
+      gmt_modified: '2019-10-30 19:58:36'
+    }
+  ])
   await Video.insertMany([
     {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '18',
       chapter_id: '32',
       title: '第一节',
@@ -660,7 +656,7 @@ async function main () {
       gmt_create: '2019-10-11 11:32:59',
       gmt_modified: '2019-10-11 11:57:38'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '14',
       chapter_id: '1',
       title: '12',
@@ -676,7 +672,7 @@ async function main () {
       gmt_create: '2019-10-19 05:51:23',
       gmt_modified: '2019-10-19 05:51:33'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '18',
       chapter_id: '44',
       title: '测试',
@@ -692,7 +688,7 @@ async function main () {
       gmt_create: '2019-10-30 14:51:55',
       gmt_modified: '2019-10-30 14:51:55'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '18',
       chapter_id: '1181729226915577857',
       title: 'test',
@@ -708,7 +704,7 @@ async function main () {
       gmt_create: '2019-10-30 17:17:41',
       gmt_modified: '2019-10-30 17:17:41'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '18',
       chapter_id: '1181729226915577857',
       title: '22',
@@ -724,7 +720,7 @@ async function main () {
       gmt_create: '2019-10-30 17:37:29',
       gmt_modified: '2019-10-30 17:37:29'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '1192252213659774977',
       chapter_id: '1192252428399751169',
       title: '第一课时',
@@ -740,7 +736,7 @@ async function main () {
       gmt_create: '2019-11-07 09:29:59',
       gmt_modified: '2019-11-07 09:29:59'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '1192252213659774977',
       chapter_id: '1192252428399751169',
       title: '第二课时',
@@ -756,7 +752,7 @@ async function main () {
       gmt_create: '2019-11-08 10:21:10',
       gmt_modified: '2019-11-08 10:21:22'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '1192252213659774977',
       chapter_id: '1192252428399751169',
       title: '第三课时',
@@ -772,7 +768,7 @@ async function main () {
       gmt_create: '2019-11-08 10:38:40',
       gmt_modified: '2019-11-08 10:38:40'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '1192252213659774977',
       chapter_id: '1192252428399751169',
       title: '第四课时',
@@ -788,7 +784,7 @@ async function main () {
       gmt_create: '2019-11-12 13:00:05',
       gmt_modified: '2019-11-12 13:00:05'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '1192252213659774977',
       chapter_id: '1192252428399751169',
       title: '第五课时',
@@ -804,7 +800,7 @@ async function main () {
       gmt_create: '2019-11-18 11:08:03',
       gmt_modified: '2019-11-18 11:08:03'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '18',
       chapter_id: '15',
       title: '第一节：Java简介',
@@ -820,7 +816,7 @@ async function main () {
       gmt_create: '2019-01-01 13:08:57',
       gmt_modified: '2019-10-11 11:26:39'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '18',
       chapter_id: '15',
       title: '第二节：表达式和赋值语句',
@@ -836,7 +832,7 @@ async function main () {
       gmt_create: '2019-01-01 13:09:02',
       gmt_modified: '2019-03-08 03:30:27'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '18',
       chapter_id: '15',
       title: '第三节：String类',
@@ -852,7 +848,7 @@ async function main () {
       gmt_create: '2019-01-01 13:09:05',
       gmt_modified: '2019-11-12 12:50:45'
     }, {
-     id: new Types.ObjectId(),
+      id: new Types.ObjectId(),
       course_id: '18',
       chapter_id: '15',
       title: '第四节：程序风格',
