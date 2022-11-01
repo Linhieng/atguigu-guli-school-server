@@ -7,7 +7,8 @@ const getAllTeacher: RequestHandler = async (req, res) => {
   let status = 500
 
   try {
-    result.data = await EduTeacher.find({ is_deleted: false })
+    const items = await EduTeacher.find({ is_deleted: false })
+    result.data = {items}
 
     status = 200
     result.success = true
