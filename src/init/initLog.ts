@@ -7,7 +7,8 @@ import util from 'util'
 import { formatDate } from '../util/base'
 
 function myLog () {
-  // debug 写入文件, info 只输出到控制台
+  // debug 写入文件, info 只输出到控制台, log 和 error 既写入又输出
+  // 预期的错误用 debug, 未知的错误用 error
   globalThis.console.debug = function (...args) {
     const data = util.format.apply(null, args) + '\n'
     fs.appendFileSync('log/my-debug.log', formatDate(new Date()) + ' ' + data)

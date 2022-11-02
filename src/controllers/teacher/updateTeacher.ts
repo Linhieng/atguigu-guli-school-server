@@ -76,13 +76,15 @@ const updateTeacher: RequestHandler = async (req, res) => {
     result.code = SUCCESS
     result.message = '成功'
   } catch (e) {
-    console.error(e)
+
     if (e instanceof ReadError) {
+      console.debug(e)
       status = 200
       result.code = READ_ERROR
       result.message = e.message
       result.data = e.cause
     } else if (e instanceof Error.CastError) {
+      console.debug(e)
       status = 200
       result.code = M_CAST_ERROR
       result.message = e.message
@@ -94,6 +96,7 @@ const updateTeacher: RequestHandler = async (req, res) => {
         path: e.path,
       }
     } else {
+      console.error(e)
       result.message = (e as Error).name + ': ' + (e as Error).message
     }
   }

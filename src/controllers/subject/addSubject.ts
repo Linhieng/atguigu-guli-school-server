@@ -99,13 +99,15 @@ const addSubject: RequestHandler = async (req, res) => {
     result.code = SUCCESS
     result.message = '上传成功'
   } catch (e) {
-    console.error(e)
+
     if (e instanceof ReadError) {
+      console.debug(e)
       status = 200
       result.success = false
       result.code = READ_ERROR
       result.message = e.message
     } else if (e instanceof SyntaxError) {
+      console.debug(e)
       status = 200
       result.success = false
       result.code = SYNTAX_ERROR
@@ -114,6 +116,7 @@ const addSubject: RequestHandler = async (req, res) => {
         mimetype: req.file?.mimetype
       }
     } else {
+      console.error(e)
       result.message = (e as Error).name + ': ' + (e as Error).message
     }
   }

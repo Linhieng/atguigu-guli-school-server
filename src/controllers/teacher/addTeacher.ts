@@ -71,18 +71,21 @@ const addTeacher: RequestHandler = async (req, res) => {
     result.code = SUCCESS
     result.message = '创建成功'
   } catch (e) {
-    console.error(e)
+
     if (e instanceof ReadError) {
+      console.debug(e)
       status = 200
       result.code = READ_ERROR
       result.message = e.message
       result.data = e.cause
     } else if (e instanceof Error.ValidationError) {
+      console.debug(e)
       status = 200
       result.code = M_VALIDATION_ERROR
       result.message = e.name + ': ' + e.message
       result.data = e.errors
     } else {
+      console.error(e)
       result.message = (e as Error).name + ': ' + (e as Error).message
     }
   }

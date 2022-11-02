@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express'
+import { Error } from 'mongoose'
 import { EduTeacher } from '../../models/eduModel'
 import { formatDate } from '../../util/base'
 import { checkRequired, checkSyntax, factoryR } from '../func'
@@ -126,13 +127,26 @@ const getPageTeacherByQuery: RequestHandler = async (req, res) => {
     result.code = SUCCESS
     result.message = '请求成功'
   } catch (e) {
-    console.error(e)
+
     if (e instanceof ReadError) {
+      console.debug(e)
       status = 200
       result.code = READ_ERROR
       result.message = e.message
       result.data = e.cause
-    }/* else if (e instanceof CastError) { } */else {
+    } else if (e instanceof Error.CastError) {
+      console.debug(e)
+      status = 200
+      result.code = M_CAST_ERROR
+      result.message = e.message
+      result.data = {
+        kind: e.kind,
+        name: e.name,
+        path: e.path,
+        value: e.value
+      }
+    } else {
+      console.error(e)
       result.message = (e as Error).name + ': ' + (e as Error).message
     }
   }
