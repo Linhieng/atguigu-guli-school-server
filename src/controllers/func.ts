@@ -1,3 +1,5 @@
+import { Error } from "mongoose"
+
 export function factoryR (): R {
   return {
     success: false,
@@ -77,4 +79,81 @@ export function checkMime (file: Express.Multer.File, mimeArr: Array<string>, ty
     throw new SyntaxError(`请上传 ${typeInfo ? typeInfo : mimetype} 类型的资源`)
   }
   return mimetype[1]
+}
+
+export function wrappingCheckError (data: Record<string, unknown>, dataProp: Record<string, string>) {
+
+  try {
+    checkRequired(data, dataProp)
+    checkSyntax(data, dataProp)
+  } catch (e) {
+    if (e instanceof PropertyRequiredError) {
+      throw new ReadError('缺少必要参数', {
+        ...e,
+        name: e.name,
+        message: e.message,
+      })
+    } else if (e instanceof PropertySyntaxError) {
+      throw new ReadError('参数格式错误', {
+        ...e,
+        name: e.name,
+        message: e.message,
+      })
+    } else {
+      throw e
+    }
+  }
+}
+
+export function catchError (e: Error) {
+  const data: {
+    status: number,
+    code: StatusCode,
+    message: string,
+    data: Record<string, unknown>
+  } = {
+    status: 200,
+    code: ERROR,
+    message: '',
+    data: {},
+  }
+
+  if (e instanceof ReadError) {
+
+    console.debug(e)
+    data.code = READ_ERROR
+    data.message = e.message
+    data.data = {
+      name: e.name,
+      cause: e.cause
+    }
+
+  } else if (e instanceof SyntaxError) {
+
+    console.debug(e)
+    data.code = SYNTAX_ERROR
+    data.message = e.message
+
+  } else if (e instanceof Error.CastError) {
+
+    console.debug(e)
+    data.code = M_CAST_ERROR
+    data.message = e.message
+    data.data = {
+      stringValue: e.stringValue,
+      name: e.name,
+      kind: e.kind,
+      value: e.value,
+      path: e.path,
+    }
+
+  } else {
+
+    console.error(e)
+    data.status = 500
+    data.message = e.name + ': ' + e.message
+
+  }
+
+  return data
 }
