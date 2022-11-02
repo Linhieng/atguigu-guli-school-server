@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express'
-import { EduSubject } from '../../models/subject'
+import { EduSubject } from '../../models/eduModel'
 import { factoryR } from '../func'
 
 async function getList () {
-  return await EduSubject.find({}).select(['id', 'title', 'children'])
+  return await EduSubject.find({}).populate('children')
 }
 
 const getAllSubject: RequestHandler = async (req, res) => {

@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { Types, Error, Schema } from 'mongoose'
-import { EduTeacher } from '../../models/teacher'
+import { EduTeacher } from '../../models/eduModel'
 import { checkRequired, checkSyntax, factoryR } from '../func'
 
 type Teacher = {
@@ -56,7 +56,7 @@ async function update (body: Teacher) {
   newData.gmt_modified = new Date()
   await EduTeacher
     .findOneAndUpdate({
-      id: new Types.ObjectId(body.id),
+      _id: new Types.ObjectId(body.id),
       is_deleted: false,
     }, newData)
 }

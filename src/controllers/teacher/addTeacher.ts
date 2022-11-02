@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { Types, Error } from 'mongoose'
-import { EduTeacher } from '../../models/teacher'
+import { EduTeacher } from '../../models/eduModel'
 import { checkRequired, checkSyntax, factoryR } from '../func'
 
 type Teacher = {
@@ -45,17 +45,14 @@ function checkTeacher (teacher: Record<string, unknown>) {
 }
 
 async function add (data: Teacher) {
-  const teacher: IEduTeacher = {
-    id: new Types.ObjectId(),
+  const teacher = {
     name: data.name,
     sort: data.sort,
     level: data.level,
     career: data.career,
     intro: data.intro,
-    avatar: data.avatar === '' ? undefined : data.avatar,
+    avatar: data.avatar,
     is_deleted: false,
-    gmt_create: new Date(),
-    gmt_modified: undefined,
   }
   const dTeacher = new EduTeacher(teacher)
   await dTeacher.save()
@@ -94,4 +91,5 @@ const addTeacher: RequestHandler = async (req, res) => {
     .status(status)
     .json(result)
 }
+
 export default addTeacher

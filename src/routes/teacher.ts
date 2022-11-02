@@ -9,7 +9,6 @@ import updateTeacher from '../controllers/teacher/updateTeacher'
 const router = Router()
 
 router.get('/findAll', getAllTeacher)
-// router.get('/pageTeacher/:current/:limit', page)
 router.get('/getTeacher/', getTeacher)
 router.get('/getTeacher/:id', getTeacher)
 router.post('/pageTeacherCondition', getPageTeacherByQuery)

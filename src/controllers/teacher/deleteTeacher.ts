@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { Types, Error } from 'mongoose'
-import { EduTeacher } from '../../models/teacher'
+import { EduTeacher } from '../../models/eduModel'
 import { checkRequired, checkSyntax, factoryR } from '../func'
 
 type Params = { id: string }
@@ -40,7 +40,7 @@ const deleteTeacher: RequestHandler = async (req, res) => {
     checkData(params)
     await EduTeacher
       .findOneAndUpdate(
-        { id: new Types.ObjectId(params.id) },
+        { _id: new Types.ObjectId(params.id) },
         { is_deleted: true }
       )
 

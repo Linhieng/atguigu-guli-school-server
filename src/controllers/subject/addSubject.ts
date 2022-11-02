@@ -1,6 +1,4 @@
-import { Types } from 'mongoose'
 import { RequestHandler } from 'express'
-import { EduSubject } from '../../models/subject'
 import { checkFile, checkMime, factoryR } from '../func'
 import xlsx from 'node-xlsx'
 
@@ -12,43 +10,23 @@ function checkData (file: Express.Multer.File) {
   ], 'xls 和 xlsx')
 }
 
-// TODO: 查找 API, 考虑其他方式实现. 只考虑了一级目录的重复性, 暂未考虑二级目录重复的情况
 async function saveSubject (buffer: Buffer) {
 
-  const data = xlsx.parse(buffer)[0].data as Array<Array<string>>
   const newSubject: Record<string, Array<string>> = {}
-
-  data.forEach((row, i) => {
+  const excel = xlsx.parse(buffer)[0].data as Array<Array<string>>
+  // key 是父专业, value 是子专业数组
+  excel.forEach((row, i) => {
     if (i === 0) return // 忽略首行
-
-    if (newSubject[row[0]] instanceof Array) {
-      newSubject[row[0]].push(row[1])
+    const parent = row[0]
+    const child = row[1]
+    if (newSubject[parent] instanceof Array) {
+      newSubject[parent].push(child)
     } else {
-      newSubject[row[0]] = []
-      newSubject[row[0]].push(row[1])
+      newSubject[parent] = []
+      newSubject[parent].push(child)
     }
   })
-  Object.keys(newSubject).forEach(async (key) => {
-    const newChildren: Array<any> = []
-    newSubject[key].forEach(title => {
-      newChildren.push({
-        id: new Types.ObjectId(),
-        title,
-        gmt_create: new Date()
-      })
-    })
-    const data = await EduSubject.findOneAndUpdate({ title: key }, {
-      '$push': { children: { $each: newChildren } }
-    })
-    if (data === null) {
-      await EduSubject.insertMany([{
-        id: new Types.ObjectId(),
-        title: key,
-        children: newChildren,
-        gmt_create: new Date(),
-      }])
-    }
-  })
+
 }
 
 const getAllSubject: RequestHandler = async (req, res) => {
@@ -58,7 +36,7 @@ const getAllSubject: RequestHandler = async (req, res) => {
   try {
 
     checkData(req.file!)
-    saveSubject(req.file!.buffer)
+    await saveSubject(req.file!.buffer)
 
     result.data = {}
 

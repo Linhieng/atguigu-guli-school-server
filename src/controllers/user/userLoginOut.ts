@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { factoryR } from '../func'
 
+// TODO
 const userLoginOut: RequestHandler = async (req, res) => {
   const result = factoryR()
   let status = 500

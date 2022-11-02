@@ -1,13 +1,12 @@
 import { RequestHandler } from 'express'
-// import { EduTeacher } from '../../models/teacher'
 import { factoryR } from '../func'
 
+// TODO
 const userLogin: RequestHandler = async (req, res) => {
   const result = factoryR()
   let status = 500
 
   try {
-    // result.data = await EduTeacher.find({})
     result.data = {
       token: 'user-token',
     }

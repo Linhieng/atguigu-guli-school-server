@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { EduTeacher } from '../../models/teacher'
+import { EduTeacher } from '../../models/eduModel'
 import { factoryR } from '../func'
 
 const getAllTeacher: RequestHandler = async (req, res) => {
@@ -8,7 +8,8 @@ const getAllTeacher: RequestHandler = async (req, res) => {
 
   try {
     const items = await EduTeacher.find({ is_deleted: false })
-    result.data = {items}
+
+    result.data = { items }
 
     status = 200
     result.success = true
@@ -16,7 +17,6 @@ const getAllTeacher: RequestHandler = async (req, res) => {
     result.message = '请求成功'
   } catch (e) {
     console.error(e)
-    // TODO: find 可能会抛出异常
     result.message = (e as Error).name + ': ' + (e as Error).message
   }
 

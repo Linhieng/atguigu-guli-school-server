@@ -1,7 +1,6 @@
-
 // 我的自定义错误
 declare class MyError extends Error {
-  constructor(message: string)
+  constructor (message: string)
 }
 declare class ReadError extends MyError {
   cause: Record<string, unknown>
@@ -11,9 +10,9 @@ declare class ReadError extends MyError {
 declare class ValidationError extends MyError { }
 // 校验类型不通过 错误
 declare class PropertyRequiredError extends ValidationError {
-  constructor(property: string)
+  constructor (property: string)
 }
 // 属性格式 错误
 declare class PropertySyntaxError extends ValidationError {
-  constructor(property: string)
+  constructor (property: string)
 }

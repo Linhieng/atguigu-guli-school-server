@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { Types, Error } from 'mongoose'
-import { EduTeacher } from '../../models/teacher'
+import { EduTeacher } from '../../models/eduModel'
 import { checkRequired, checkSyntax, factoryR } from '../func'
 
 type Params = { id: string }
@@ -41,10 +41,10 @@ const getTeacher: RequestHandler = async (req, res) => {
 
     const teacher = await EduTeacher
       .findOne({
-        id: new Types.ObjectId(params.id),
+        _id: new Types.ObjectId(params.id),
         is_deleted: false,
       })
-    result.data = {teacher}
+    result.data = { teacher }
 
     status = 200
     result.success = true

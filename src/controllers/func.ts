@@ -74,7 +74,7 @@ export function checkMimePrefix (file: Express.Multer.File, mime: MimeTypePrefix
 export function checkMime (file: Express.Multer.File, mimeArr: Array<string>, typeInfo?: string): string {
   const mimetype = file.mimetype
   if (!(mimeArr.includes(mimetype))) {
-    throw new SyntaxError(`请上传 ${typeInfo? typeInfo : mimetype} 类型的资源`)
+    throw new SyntaxError(`请上传 ${typeInfo ? typeInfo : mimetype} 类型的资源`)
   }
   return mimetype[1]
 }

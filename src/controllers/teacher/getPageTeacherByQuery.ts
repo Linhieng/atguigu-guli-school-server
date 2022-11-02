@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { EduTeacher } from '../../models/teacher'
+import { EduTeacher } from '../../models/eduModel'
 import { formatDate } from '../../util/base'
 import { checkRequired, checkSyntax, factoryR } from '../func'
 
@@ -22,7 +22,7 @@ type Params = {
   limit: number,
 }
 type ResData = {
-  rows: Array<IEduTeacher>,
+  rows: Array<{}>,
   total: number,
 }
 
@@ -87,16 +87,16 @@ function getQuery (body: BodyProp): QueryProp {
   return query
 }
 
+// NOTE: 不是模糊搜索
 async function findData (params: Params, query: QueryProp): Promise<ResData> {
   const start = (params.current - 1) * params.limit
   const end = start + params.limit
 
-  const accord = await EduTeacher
-    .find({
-      ...query,
-      is_deleted: false,
-    })
-    .lean() as Array<IEduTeacher>
+  const docs = await EduTeacher.find({
+    ...query,
+    is_deleted: false,
+  })
+  const accord = docs.reduce((pre: Array<IEduTeacher>, doc) => ([...pre, doc.toObject() as IEduTeacher]), [])
   const total = accord.length
   const rows = accord.slice(start, end)
 
