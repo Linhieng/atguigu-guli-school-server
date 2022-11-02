@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { factoryR } from '../func'
+import { catchError, factoryR } from '../func'
 
 // TODO
 const userLogin: RequestHandler = async (req, res) => {
@@ -16,7 +16,14 @@ const userLogin: RequestHandler = async (req, res) => {
     result.code = SUCCESS
     result.message = '请求成功'
   } catch (e) {
-    result.message = (e as Error).name + ': ' + (e as Error).message
+
+    const { status: s, code, message, data } = catchError(e as Error)
+    status = s
+    result.success = false
+    result.code = code
+    result.message = message
+    result.data = data
+
   }
 
   res

@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { Types, Error } from 'mongoose'
 import { EduTeacher } from '../../models/eduModel'
-import { checkRequired, checkSyntax, factoryR } from '../func'
+import { catchError, checkRequired, checkSyntax, factoryR } from '../func'
 
 type Params = { id: string }
 
@@ -52,28 +52,13 @@ const getTeacher: RequestHandler = async (req, res) => {
     result.message = '成功'
   } catch (e) {
 
-    if (e instanceof ReadError) {
-      console.debug(e)
-      status = 200
-      result.code = READ_ERROR
-      result.message = e.message
-      result.data = e.cause
-    } else if (e instanceof Error.CastError) {
-      console.debug(e)
-      status = 200
-      result.code = M_CAST_ERROR
-      result.message = e.message
-      result.data = {
-        name: e.name,
-        stringValue: e.stringValue,
-        kind: e.kind,
-        value: e.value,
-        path: e.path,
-      }
-    } else {
-      console.error(e)
-      result.message = (e as Error).name + ': ' + (e as Error).message
-    }
+    const { status: s, code, message, data } = catchError(e as Error)
+    status = s
+    result.success = false
+    result.code = code
+    result.message = message
+    result.data = data
+
   }
 
   res

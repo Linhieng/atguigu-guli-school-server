@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { checkFile, checkMimePrefix, factoryR } from '../func'
+import { catchError, checkFile, checkMimePrefix, factoryR } from '../func'
 import OSS from 'ali-oss'
 import { onlyOne } from '../../util/base'
 import privateData from '../../../private.json'
@@ -23,7 +23,6 @@ async function updateOss (fileFullName: string, buffer: Buffer) {
   return result.url
 }
 
-
 const fileoss: RequestHandler = async (req, res) => {
   const result = factoryR()
   let status = 500
@@ -41,26 +40,13 @@ const fileoss: RequestHandler = async (req, res) => {
     result.message = '请求成功'
   } catch (e) {
 
-    if (e instanceof ReadError) {
-      console.debug(e)
-      status = 200
-      result.success = false
-      result.code = READ_ERROR
-      result.message = e.message
-      result.data = {
-        name: e.name,
-        cause: e.cause
-      }
-    } else if (e instanceof SyntaxError) {
-      console.debug(e)
-      status = 200
-      result.success = false
-      result.code = READ_ERROR
-      result.message = e.message
-    } else {
-      console.error(e)
-      result.message = (e as Error).name + ': ' + (e as Error).message
-    }
+    const { status: s, code, message, data } = catchError(e as Error)
+    status = s
+    result.success = false
+    result.code = code
+    result.message = message
+    result.data = data
+
   }
 
   res

@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { EduSubject } from '../../models/eduModel'
-import { factoryR } from '../func'
+import { catchError, factoryR } from '../func'
 
 async function getList () {
   return await EduSubject.find({}).populate('children')
@@ -19,8 +19,16 @@ const getAllSubject: RequestHandler = async (req, res) => {
     result.success = true
     result.code = SUCCESS
     result.message = '请求成功'
+
   } catch (e) {
-    result.message = (e as Error).name + ': ' + (e as Error).message
+
+    const { status: s, code, message, data } = catchError(e as Error)
+    status = s
+    result.success = false
+    result.code = code
+    result.message = message
+    result.data = data
+
   }
 
   res

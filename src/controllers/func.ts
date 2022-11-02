@@ -147,6 +147,14 @@ export function catchError (e: Error) {
       path: e.path,
     }
 
+  } else if (e instanceof Error.ValidationError) {
+
+    console.debug(e)
+    data.status = 200
+    data.code = M_VALIDATION_ERROR
+    data.message = e.name + ': ' + e.message
+    data.data = e.errors
+
   } else {
 
     console.error(e)

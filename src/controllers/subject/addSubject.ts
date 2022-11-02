@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { checkFile, checkMime, factoryR } from '../func'
+import { catchError, checkFile, checkMime, factoryR } from '../func'
 import xlsx from 'node-xlsx'
 import { EduSubject, EduSubjectChildren } from '../../models/eduModel'
 
@@ -100,25 +100,15 @@ const addSubject: RequestHandler = async (req, res) => {
     result.message = '上传成功'
   } catch (e) {
 
-    if (e instanceof ReadError) {
-      console.debug(e)
-      status = 200
-      result.success = false
-      result.code = READ_ERROR
-      result.message = e.message
-    } else if (e instanceof SyntaxError) {
-      console.debug(e)
-      status = 200
-      result.success = false
-      result.code = SYNTAX_ERROR
-      result.message = e.message
-      result.data = {
-        mimetype: req.file?.mimetype
-      }
-    } else {
-      console.error(e)
-      result.message = (e as Error).name + ': ' + (e as Error).message
+    const { status: s, code, message, data } = catchError(e as Error)
+    status = s
+    result.success = false
+    result.code = code
+    result.message = message
+    result.data = {...data,
+      mimetype: req.file?.mimetype
     }
+
   }
 
   res
