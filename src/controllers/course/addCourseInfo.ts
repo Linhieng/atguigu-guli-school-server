@@ -23,7 +23,7 @@ const courseProp = {
 }
 
 async function add (body: Course) {
-  await EduCourse.insertMany({
+  const c = await EduCourse.insertMany({
     teacher_id: new Types.ObjectId(body.teacherId),
     subject_id: new Types.ObjectId(body.subjectId),
     subject_parent_id: new Types.ObjectId(body.subjectParentId),
@@ -32,6 +32,7 @@ async function add (body: Course) {
     lesson_num: body.lessonNum,
     cover: body.cover,
   })
+  return c[0]._id
 }
 
 const addCourseInfo: RequestHandler = async (req, res) => {
@@ -41,8 +42,11 @@ const addCourseInfo: RequestHandler = async (req, res) => {
   try {
 
     wrappingCheckError(req.body, courseProp)
-    await add(req.body)
+    const courseId = await add(req.body)
 
+    result.data = {
+      courseId
+    }
     status = 200
     result.success = true
     result.code = SUCCESS
