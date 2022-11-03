@@ -19,18 +19,29 @@ export function checkRequired (data: Record<string, unknown>, requiredProp: Reco
 }
 
 /**
- * 简单的校验 data 的数据类型是否是 dataType 定义的一样
- * 允许 data 有多余的属性;
- * 允许字符类型的数字, 校验后会将字符转换为数字
- * 注意: 对于字符串, 允许空字符串
+ * @前置要求 要求通过 checkRequired 校验, 即: dataType 的 key 是 data 中的 key 的子集!
+ * @功能简要 根据 dataType 中提供的 key(属性名) value(属性类型), 校验 data 中对应的属性的类型是否符合要求
+ * @注意　 该函数仅做普遍通用的校验, 更加详细但不通用的校验, 请另起函数
+ *        允许 data 有多余的属性;
+ *        对于 number, 允许字符类型的数字, 并且校验后会将字符转换为数字
+ *        对于 string, 允许空字符串
+ *        对于 String, 不允许空字符串, 相当于 required
+ *        对于 Date, 若校验成功会返回 Date 对象
+ *        对于 ObjectId, 不允许空字符串和非法字符串
+ *        除此之外的类型, 仅仅使用 typeof 进行简单校验
  * @param data 待校验的数据对象
- * @param dataType 定义了 data 各个属性的类型, 支持基本数据类型和 Date
+ * @param dataType 定义了 data 各个属性的类型
+ * @Error 如果校验失败, 会抛出 PropertySyntaxError
  */
 export function checkSyntax (data: Record<string, unknown>, dataType: Record<string, string>) {
   Object.keys(data).forEach((prop) => {
-    if (dataType[prop] === undefined) return
+    const expectType = dataType[prop]
+    const realType = typeof data[prop]
+    const realValue = data[prop]
 
-    if (dataType[prop] === 'number') {
+    if (expectType === undefined) return
+
+    if (expectType === 'number') {
 
       if (isNaN(Number(data[prop]))) {
         throw new PropertySyntaxError(prop)
@@ -38,23 +49,23 @@ export function checkSyntax (data: Record<string, unknown>, dataType: Record<str
         data[prop] = Number(data[prop])
       }
 
-    } else if (dataType[prop] === 'Date') {
+    } else if (expectType === 'Date') {
 
       const d = new Date(data[prop] as any)
       if (isNaN(d.getTime())) {
-        throw new PropertySyntaxError(prop)
+        throw new PropertySyntaxError(prop, '无法转换为日期')
       } else {
         data[prop] = d
       }
 
-    } else if (dataType[prop] === 'ObjectId') {
+    } else if (expectType === 'ObjectId') {
 
       const s = data[prop] as string
       if (typeof s !== 'string') {
-        throw new PropertySyntaxError(prop)
+        throw new PropertySyntaxError(prop, '要求是字符串')
       }
       if (s.trim() === '') {
-        throw new PropertySyntaxError(prop)
+        throw new PropertySyntaxError(prop, '不允许空字符')
       }
       try {
         new Types.ObjectId(s)
@@ -62,9 +73,18 @@ export function checkSyntax (data: Record<string, unknown>, dataType: Record<str
         throw new PropertySyntaxError(prop, '不是合法的 ObjectId 字符串')
       }
 
-    } else if (typeof data[prop] !== dataType[prop]) {
+    } else if (expectType === 'String') {
 
-      throw new PropertySyntaxError(prop)
+      if (realType !== 'string') {
+        throw new PropertySyntaxError(prop, '要求是字符串')
+      }
+      if ((realValue as string).trim() === '') {
+        throw new PropertySyntaxError(prop, '不允许空字符串')
+      }
+
+    } else if (expectType !== realType) {
+
+      throw new PropertySyntaxError(prop, `期待 ${expectType} 类型, 却收到 ${realType} 类型`)
 
     }
   })
