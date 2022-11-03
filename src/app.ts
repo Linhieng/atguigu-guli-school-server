@@ -4,6 +4,7 @@ import teacherRoutes from './routes/teacher'
 import userRoutes from './routes/user'
 import subjectRoutes from './routes/subject'
 import courseRoutes from './routes/course'
+import chapterRoutes from './routes/chapter'
 import { json } from 'body-parser'
 import cors from 'cors'
 
@@ -29,6 +30,7 @@ app.use('/eduservice/user', userRoutes)
 app.use('/eduservice/teacher', teacherRoutes)
 app.use('/eduservice/subject', subjectRoutes)
 app.use('/eduservice/course', courseRoutes)
+app.use('/eduservice/chapter', chapterRoutes)
 app.use('/eduoss', eduossRoutes)
 
 app.use(globalError)
