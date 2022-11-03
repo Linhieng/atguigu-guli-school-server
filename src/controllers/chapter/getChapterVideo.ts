@@ -19,10 +19,10 @@ async function get (courseId: ObjectId) {
   const isExist = await EduChapter.exists({ course_id: courseId })
 
   if (!isExist) {
-      return {}
+      return []
   }
 
-  return await EduChapter.findOne({ course_id: courseId })
+  return await EduChapter.find({ course_id: courseId })
 }
 
 const getChapterVideo: RequestHandler = async (req, res) => {
@@ -34,7 +34,8 @@ const getChapterVideo: RequestHandler = async (req, res) => {
     const params = req.params as Params
     wrappingCheckError(params, paramsProp)
 
-    result.data = await get(new Types.ObjectId(params.id))
+    const allChapterVideo = await get(new Types.ObjectId(params.id))
+    result.data = { allChapterVideo }
     status = 200
     result.success = true
     result.code = SUCCESS
