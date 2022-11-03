@@ -1,4 +1,4 @@
-import { Error } from "mongoose"
+import { Error, Types } from "mongoose"
 
 export function factoryR (): R {
   return {
@@ -21,6 +21,7 @@ export function checkRequired (data: Record<string, unknown>, requiredProp: Reco
  * 简单的校验 data 的数据类型是否是 dataType 定义的一样
  * 允许 data 有多余的属性;
  * 允许字符类型的数字, 校验后会将字符转换为数字
+ * 注意: 对于字符串, 允许空字符串
  * @param data 待校验的数据对象
  * @param dataType 定义了 data 各个属性的类型, 支持基本数据类型和 Date
  */
@@ -43,6 +44,21 @@ export function checkSyntax (data: Record<string, unknown>, dataType: Record<str
         throw new PropertySyntaxError(prop)
       } else {
         data[prop] = d
+      }
+
+    } else if (dataType[prop] === 'ObjectId') {
+
+      const s = data[prop] as string
+      if (typeof s !== 'string') {
+        throw new PropertySyntaxError(prop)
+      }
+      if (s.trim() === '') {
+        throw new PropertySyntaxError(prop)
+      }
+      try {
+        new Types.ObjectId(s)
+      } catch (error) {
+        throw new PropertySyntaxError(prop, '不是合法的 ObjectId 字符串')
       }
 
     } else if (typeof data[prop] !== dataType[prop]) {

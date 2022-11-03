@@ -1,7 +1,7 @@
 import { RequestHandler } from "express"
 import { Types } from "mongoose"
 import { EduCourse } from "../../models/eduModel"
-import { catchError, checkRequired, checkSyntax, factoryR, wrappingCheckError } from "../func"
+import { catchError, factoryR, wrappingCheckError } from "../func"
 
 type Course = {
   teacherId: ObjectId,
@@ -13,9 +13,9 @@ type Course = {
   cover: String,
 }
 const courseProp = {
-  teacherId: 'string',
-  subjectId: 'string',
-  subjectParentId: 'string',
+  teacherId: 'ObjectId',
+  subjectId: 'ObjectId',
+  subjectParentId: 'ObjectId',
   title: 'string',
   price: 'number',
   lessonNum: 'number',

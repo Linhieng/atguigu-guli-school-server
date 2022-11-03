@@ -19,9 +19,11 @@ export default function initErrorObj () {
 
   class PropertySyntaxError extends ValidationError {
     property: string
-    constructor (property: string) {
+    info?: string
+    constructor (property: string, info?: string) {
       super('Property syntax error: ' + property)
       this.property = property
+      this.info = info
     }
   }
 

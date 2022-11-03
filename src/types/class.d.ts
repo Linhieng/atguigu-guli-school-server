@@ -14,5 +14,7 @@ declare class PropertyRequiredError extends ValidationError {
 }
 // 属性格式 错误
 declare class PropertySyntaxError extends ValidationError {
-  constructor (property: string)
+  property: string
+  info?: string
+  constructor (property: string, info?: string)
 }
