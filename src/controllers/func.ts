@@ -1,3 +1,4 @@
+import { RequestHandler } from "express"
 import { Error, Types } from "mongoose"
 
 export function factoryR (): R {
@@ -180,4 +181,45 @@ export function catchError (e: Error) {
   }
 
   return data
+}
+
+/**
+ * 高阶函数, 作用是提取出响应时的重复工作, 比如: 处理报错
+ * @param cb 回调函数, 在这里面不需要 trycatch, handleRequest 已经帮忙做了, 返回的值会作为响应的数据
+ * @param options 可选的相关配置, 暂时只想到了 successMessage
+ * @returns 返回一个函数, 供 express 路由调用
+ */
+type handleOptions = {
+  successMessage?: string
+}
+type Callback = (req: Express.Request) => any
+export function handleRequest (cb: Callback, options?: handleOptions): RequestHandler {
+  return async (req, res) => {
+    const result = factoryR()
+    let status = 500
+
+    try {
+
+      result.data = await cb(req) || {}
+
+      status = 200
+      result.success = true
+      result.code = SUCCESS
+      result.message = options?.successMessage || '请求成功'
+
+    } catch (e) {
+
+      const { status: s, code, message, data } = catchError(e as Error)
+      status = s
+      result.success = false
+      result.code = code
+      result.message = message
+      result.data = data
+
+    }
+
+    res
+      .status(status)
+      .json(result)
+  }
 }
