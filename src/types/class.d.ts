@@ -10,6 +10,7 @@ declare class ReadError extends MyError {
 declare class ValidationError extends MyError { }
 // 校验类型不通过 错误
 declare class PropertyRequiredError extends ValidationError {
+  property: string
   constructor (property: string)
 }
 // 属性格式 错误

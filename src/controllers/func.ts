@@ -157,13 +157,13 @@ export function wrappingCheckError (data: Record<string, unknown>, dataProp: Rec
     checkSyntax(data, dataProp)
   } catch (e) {
     if (e instanceof PropertyRequiredError) {
-      throw new ReadError('缺少必要参数', {
+      throw new ReadError(`缺少必要参数: ${e.property}`, {
         ...e,
         name: e.name,
         message: e.message,
       })
     } else if (e instanceof PropertySyntaxError) {
-      throw new ReadError('参数格式错误', {
+      throw new ReadError(`参数（${e.property}）格式错误`, {
         ...e,
         name: e.name,
         message: e.message,

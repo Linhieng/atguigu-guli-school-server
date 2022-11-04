@@ -16,7 +16,7 @@ const courseProp = {
   teacherId: 'ObjectId',
   subjectId: 'ObjectId',
   subjectParentId: 'ObjectId',
-  title: 'string',
+  title: 'String',
   price: 'number',
   lessonNum: 'number',
   cover: 'string',
