@@ -1,6 +1,10 @@
 import { RequestHandler } from "express"
 import { Error, Types } from "mongoose"
 
+/**
+ *
+ * @returns 统一的 response 响应格式对象
+ */
 export function factoryR (): R {
   return {
     success: false,
@@ -10,6 +14,11 @@ export function factoryR (): R {
   }
 }
 
+/**
+ * 只对属性是否存在进行校验, 不会校验他的值
+ * @param data 待检查的对象
+ * @param requiredProp 一个对象, key 是必须存在的属性, 不关注 value (可为 undefined)
+ */
 export function checkRequired (data: Record<string, unknown>, requiredProp: Record<string, any>) {
   Object.keys(requiredProp).forEach(prop => {
     if (Object.prototype.hasOwnProperty.call(data, prop) === false) {
@@ -90,6 +99,11 @@ export function checkSyntax (data: Record<string, unknown>, dataType: Record<str
   })
 }
 
+/**
+ * 只校验单文件是否存在文件数据
+ * @param file 单个文件 req.file
+ * @Error 文件不存在时, 抛出 ReadError
+ */
 export function checkFile (file?: Express.Multer.File) {
   if (!(file?.buffer instanceof Buffer)) {
     throw new ReadError('没有文件!', {})
@@ -97,10 +111,13 @@ export function checkFile (file?: Express.Multer.File) {
 }
 
 /**
- *
- * @param file 必须是 File 类型
- * @param mime 合法的 mimetype 前缀, 比如 image,
- * @returns 返回 mimetype 的后缀, 比如 image/png 返回 png
+ * 校验文件的 mimetype 前缀是否符合
+ * @前置条件 文件必须存在, 一般结合 checkFile() 使用
+ * @注意 不会真正识别文件类型, 只通过后缀名识别的
+ * @param file 待校验的文件
+ * @param mime 合法的 mimetype 前缀: text, image, audio, video, application
+ * @returns 文件后缀名, 比如 image/png 返回 png
+ * @Error 类型校验出错时, 抛出原生错误 SyntaxError
  */
 export function checkMimePrefix (file: Express.Multer.File, mime: MimeTypePrefix): string {
   const mimetype = file.mimetype.split('/')
@@ -110,6 +127,15 @@ export function checkMimePrefix (file: Express.Multer.File, mime: MimeTypePrefix
   return mimetype[1]
 }
 
+/**
+ * 严格校验文件的 mimetype 类型
+ * @前置条件 文件必须存在, 一般结合 checkFile() 使用
+ * @param file 待校验的文件
+ * @param mimeArr mimetype 字符串数组, 严格要求字符串匹配
+ * @param typeInfo 当类型错误时提供的正确类型说明
+ * @returns 文件后缀名, 比如 image/png 返回 png
+ * @Error 校验失败时, 抛出原生错误 SyntaxError
+ */
 export function checkMime (file: Express.Multer.File, mimeArr: Array<string>, typeInfo?: string): string {
   const mimetype = file.mimetype
   if (!(mimeArr.includes(mimetype))) {
@@ -118,6 +144,12 @@ export function checkMime (file: Express.Multer.File, mimeArr: Array<string>, ty
   return mimetype[1]
 }
 
+/**
+ * 封装基本的属性校验, 进行属性是否存在和格式是否正确的基础校验
+ * @param data
+ * @param dataProp
+ * @Error 校验失败时, 将 PropertyRequiredError 和 PropertySyntaxError 错误封装成 ReadError, 其他错误照常抛出
+ */
 export function wrappingCheckError (data: Record<string, unknown>, dataProp: Record<string, string>) {
 
   try {
@@ -142,6 +174,12 @@ export function wrappingCheckError (data: Record<string, unknown>, dataProp: Rec
   }
 }
 
+/**
+ * 封装路由中 trycatch 中对错误的处理, 理想上, 在这其中应识别到所有预期的错误,
+ * 具体的错误细节说明, 不由该函数负责
+ * @param e trycatch 中 catch 到的错误
+ * @returns 返回出错时响应的 data 数据
+ */
 export function catchError (e: Error) {
   const data: {
     status: number,
@@ -204,7 +242,7 @@ export function catchError (e: Error) {
 }
 
 /**
- * 高阶函数, 作用是提取出响应时的重复工作, 比如: 处理报错
+ * 高阶函数, 作用是提取出响应时的重复工作, 比如: 处理报错, 响应的状态码和数据
  * @param cb 回调函数, 在这里面不需要 trycatch, handleRequest 已经帮忙做了, 返回的值会作为响应的数据
  * @param options 可选的相关配置, 暂时只想到了 successMessage
  * @returns 返回一个函数, 供 express 路由调用
