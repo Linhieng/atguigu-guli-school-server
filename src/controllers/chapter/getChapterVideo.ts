@@ -1,7 +1,6 @@
-import { RequestHandler } from "express"
 import { Types } from "mongoose"
-import { EduChapter, EduCourse } from "../../models/eduModel"
-import { catchError, factoryR, wrappingCheckError } from "../func"
+import { EduChapter } from "../../models/eduModel"
+import { handleRequest } from "../func"
 
 type Params = {
   id: string,
@@ -19,42 +18,22 @@ async function get (courseId: ObjectId) {
   const isExist = await EduChapter.exists({ course_id: courseId })
 
   if (!isExist) {
-      return []
+    return []
   }
 
   return await EduChapter.find({ course_id: courseId })
 }
 
-const getChapterVideo: RequestHandler = async (req, res) => {
-  const result = factoryR()
-  let status = 500
+const getChapterVideo = handleRequest(async (req) => {
+  const params = req.params as Params
+  const allChapterVideo = await get(new Types.ObjectId(params.id))
 
-  try {
+  return { allChapterVideo }
 
-    const params = req.params as Params
-    wrappingCheckError(params, paramsProp)
-
-    const allChapterVideo = await get(new Types.ObjectId(params.id))
-    result.data = { allChapterVideo }
-    status = 200
-    result.success = true
-    result.code = SUCCESS
-    result.message = '请求成功'
-
-  } catch (e) {
-
-    const { status: s, code, message, data } = catchError(e as Error)
-    status = s
-    result.success = false
-    result.code = code
-    result.message = message
-    result.data = data
-
+}, {
+  checkParams: {
+    syntaxProp: paramsProp
   }
-
-  res
-    .status(status)
-    .json(result)
-}
+})
 
 export default getChapterVideo

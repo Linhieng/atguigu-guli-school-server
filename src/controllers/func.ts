@@ -262,7 +262,7 @@ type handleOptions = {
     requiredProp?: Record<string, any>
   }
 }
-type Callback = (req: Express.Request) => any
+type Callback = (req: Express.Request) => Promise<Record<string, any>> | Record<string, any>
 export function handleRequest (cb: Callback, options?: handleOptions): RequestHandler {
   return async (req, res) => {
     const result = factoryR()

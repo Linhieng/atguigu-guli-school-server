@@ -24,7 +24,8 @@ async function add (body: Chapter) {
 
 
 const addChapter = handleRequest(async (req) => {
-  await add(req.body as Chapter)
+  const chapter_id = await add(req.body as Chapter)
+  return { chapter_id }
 }, {
   checkBody: {
     syntaxProp: chapterProp
