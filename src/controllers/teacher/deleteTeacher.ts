@@ -1,34 +1,11 @@
 import { RequestHandler } from 'express'
 import { Types, Error } from 'mongoose'
 import { EduTeacher } from '../../models/eduModel'
-import { catchError, checkRequired, checkSyntax, factoryR } from '../func'
+import { catchError, checkRequired, checkSyntax, factoryR, wrappingCheckError } from '../func'
 
 type Params = { id: string }
 
 const paramsProp = { id: 'string' }
-
-function checkData (params: Record<string, unknown>) {
-  try {
-    checkRequired(params, paramsProp)
-    checkSyntax(params, paramsProp)
-  } catch (e) {
-    if (e instanceof PropertyRequiredError) {
-      throw new ReadError('缺少必要参数', {
-        ...e,
-        name: e.name,
-        message: e.message,
-      })
-    } else if (e instanceof PropertySyntaxError) {
-      throw new ReadError('参数格式错误', {
-        ...e,
-        name: e.name,
-        message: e.message,
-      })
-    } else {
-      throw e
-    }
-  }
-}
 
 const deleteTeacher: RequestHandler = async (req, res) => {
   const result = factoryR()
@@ -37,7 +14,7 @@ const deleteTeacher: RequestHandler = async (req, res) => {
   try {
     const params = req.params as unknown as Params
 
-    checkData(params)
+    wrappingCheckError(params, paramsProp)
     await EduTeacher
       .findOneAndUpdate(
         { _id: new Types.ObjectId(params.id) },

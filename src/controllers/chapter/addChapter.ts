@@ -8,7 +8,7 @@ type Chapter = {
   sort: number,
 }
 const chapterProp = {
-  title: 'string',
+  title: 'String',
   courseId: 'ObjectId',
   sort: 'number',
 }

@@ -150,11 +150,12 @@ export function checkMime (file: Express.Multer.File, mimeArr: Array<string>, ty
  * @param dataProp
  * @Error 校验失败时, 将 PropertyRequiredError 和 PropertySyntaxError 错误封装成 ReadError, 其他错误照常抛出
  */
-export function wrappingCheckError (data: Record<string, unknown>, dataProp: Record<string, string>) {
+export function wrappingCheckError (data: Record<string, unknown>, syntaxProp: Record<string, string>, requiredProp?: Record<string, string>) {
 
   try {
-    checkRequired(data, dataProp)
-    checkSyntax(data, dataProp)
+    if (requiredProp === undefined) requiredProp = syntaxProp
+    checkRequired(data, requiredProp)
+    checkSyntax(data, syntaxProp)
   } catch (e) {
     if (e instanceof PropertyRequiredError) {
       throw new ReadError(`缺少必要参数: ${e.property}`, {

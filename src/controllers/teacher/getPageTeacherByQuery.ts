@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { Error } from 'mongoose'
 import { EduTeacher } from '../../models/eduModel'
 import { formatDate } from '../../util/base'
-import { catchError, checkRequired, checkSyntax, factoryR } from '../func'
+import { catchError, checkRequired, checkSyntax, factoryR, wrappingCheckError } from '../func'
 
 type BodyProp = { // 前端传递的格式
   name?: string,
@@ -36,30 +36,6 @@ const bodyProp = {
   level: 'number',
   begin: 'Date',
   end: 'Date',
-}
-
-function checkData (params: Record<string, unknown>, body: BodyProp) {
-  try {
-    checkRequired(params, paramsProp)
-    checkSyntax(params, paramsProp)
-    checkSyntax(body, bodyProp)
-  } catch (e) {
-    if (e instanceof PropertyRequiredError) {
-      throw new ReadError('缺少必要参数', {
-        ...e,
-        name: e.name,
-        message: e.message,
-      })
-    } else if (e instanceof PropertySyntaxError) {
-      throw new ReadError('参数格式错误', {
-        ...e,
-        name: e.name,
-        message: e.message,
-      })
-    } else {
-      throw e
-    }
-  }
 }
 
 function getQuery (body: BodyProp): QueryProp {
@@ -119,7 +95,8 @@ const getPageTeacherByQuery: RequestHandler = async (req, res) => {
     const params = req.params as unknown as Params
     const body = req.body as unknown as BodyProp
 
-    checkData(params, body)
+    wrappingCheckError(params, paramsProp)
+    wrappingCheckError(body, bodyProp, {})
     result.data = await findData(params, getQuery(body))
 
     status = 200

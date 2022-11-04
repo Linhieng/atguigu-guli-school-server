@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { Types, Error, Schema } from 'mongoose'
 import { EduTeacher } from '../../models/eduModel'
-import { catchError, checkRequired, checkSyntax, factoryR } from '../func'
+import { catchError, checkRequired, checkSyntax, factoryR, wrappingCheckError } from '../func'
 
 type Teacher = {
   id: string,
@@ -25,29 +25,6 @@ const teacherProp = {
 
 const canUpdate = ['name', 'sort', 'level', 'career', 'intro', 'avatar']
 
-function checkData (body: Teacher) {
-  try {
-    checkRequired(body, teacherProp)
-    checkSyntax(body, teacherProp)
-  } catch (e) {
-    if (e instanceof PropertyRequiredError) {
-      throw new ReadError('缺少必要参数', {
-        ...e,
-        name: e.name,
-        message: e.message,
-      })
-    } else if (e instanceof PropertySyntaxError) {
-      throw new ReadError('参数格式错误', {
-        ...e,
-        name: e.name,
-        message: e.message,
-      })
-    } else {
-      throw e
-    }
-  }
-}
-
 async function update (body: Teacher) {
   const newData: Record<string, any> = {}
   canUpdate.forEach(item => {
@@ -68,7 +45,7 @@ const updateTeacher: RequestHandler = async (req, res) => {
   try {
     const body = req.body as unknown as Teacher
 
-    checkData(body)
+    wrappingCheckError(body, teacherProp)
     await update(body)
 
     status = 200
