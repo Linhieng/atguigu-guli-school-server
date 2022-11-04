@@ -1,5 +1,4 @@
-import { RequestHandler } from 'express'
-import { catchError, checkFile, checkMimePrefix, factoryR } from '../func'
+import { checkFile, checkMimePrefix, handleRequest } from '../func'
 import OSS from 'ali-oss'
 import { onlyOne } from '../../util/base'
 import privateData from '../../../private.json'
@@ -23,34 +22,10 @@ async function updateOss (fileFullName: string, buffer: Buffer) {
   return result.url
 }
 
-const fileoss: RequestHandler = async (req, res) => {
-  const result = factoryR()
-  let status = 500
-
-  try {
-
-    checkFile(req.file)
-    const suffix = checkAndGetSuffix(req.file as Express.Multer.File)
-    const url = await updateOss(onlyOne() + '.' + suffix, req.file!.buffer)
-    result.data = { url }
-
-    status = 200
-    result.success = true
-    result.code = SUCCESS
-    result.message = '请求成功'
-  } catch (e) {
-
-    const { status: s, code, message, data } = catchError(e as Error)
-    status = s
-    result.success = false
-    result.code = code
-    result.message = message
-    result.data = data
-
-  }
-
-  res
-    .status(status)
-    .json(result)
-}
+const fileoss = handleRequest(async (req) => {
+  checkFile(req.file)
+  const suffix = checkAndGetSuffix(req.file as Express.Multer.File)
+  const url = await updateOss(onlyOne() + '.' + suffix, req.file!.buffer)
+  return { url }
+})
 export default fileoss

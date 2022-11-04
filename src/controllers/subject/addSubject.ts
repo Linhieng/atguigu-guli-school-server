@@ -1,5 +1,4 @@
-import { RequestHandler } from 'express'
-import { catchError, checkFile, checkMime, factoryR } from '../func'
+import { checkFile, checkMime, handleRequest } from '../func'
 import xlsx from 'node-xlsx'
 import { EduSubject, EduSubjectChildren } from '../../models/eduModel'
 
@@ -83,37 +82,11 @@ async function saveSubject (buffer: Buffer) {
 
 }
 
-const addSubject: RequestHandler = async (req, res) => {
-  const result = factoryR()
-  let status = 500
-
-  try {
-
-    checkData(req.file!)
-    await saveSubject(req.file!.buffer)
-
-    result.data = {}
-
-    status = 200
-    result.success = true
-    result.code = SUCCESS
-    result.message = '上传成功'
-  } catch (e) {
-
-    const { status: s, code, message, data } = catchError(e as Error)
-    status = s
-    result.success = false
-    result.code = code
-    result.message = message
-    result.data = {...data,
-      mimetype: req.file?.mimetype
-    }
-
-  }
-
-  res
-    .status(status)
-    .json(result)
-}
+const addSubject = handleRequest(async (req) => {
+  checkData(req.file!)
+  await saveSubject(req.file!.buffer)
+}, {
+  successMessage: '上传成功',
+})
 
 export default addSubject

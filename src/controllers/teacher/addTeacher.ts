@@ -1,7 +1,6 @@
-import { RequestHandler } from 'express'
-import { Types, Error } from 'mongoose'
 import { EduTeacher } from '../../models/eduModel'
-import { catchError, checkRequired, checkSyntax, factoryR, wrappingCheckError } from '../func'
+import { formatDate } from '../../util/base'
+import { handleRequest } from '../func'
 
 type Teacher = {
   name: string,
@@ -22,45 +21,29 @@ const teacherProp = {
 }
 
 async function add (data: Teacher) {
-  const teacher = {
+  const teacher: Teacher = {
     name: data.name,
     sort: data.sort,
     level: data.level,
     career: data.career,
     intro: data.intro,
     avatar: data.avatar,
-    is_deleted: false,
   }
-  const dTeacher = new EduTeacher(teacher)
-  await dTeacher.save()
+  return await EduTeacher.insertMany(teacher)
 }
 
-const addTeacher: RequestHandler = async (req, res) => {
-  const result = factoryR()
-  let status = 500
+const addTeacher = handleRequest(async (req) => {
+  const newTeacher = (await add(req.body))[0].toObject()
 
-  try {
-    wrappingCheckError(req.body, teacherProp)
-    await add(req.body)
+  newTeacher.gmt_create = formatDate(newTeacher.gmt_create) as unknown as Date
+  (newTeacher as any).__v = undefined
+  return { newTeacher }
 
-    status = 200
-    result.success = true
-    result.code = SUCCESS
-    result.message = '创建成功'
-  } catch (e) {
-
-    const { status: s, code, message, data } = catchError(e as Error)
-    status = s
-    result.success = false
-    result.code = code
-    result.message = message
-    result.data = data
-
+}, {
+  successMessage: '添加成功',
+  checkBody: {
+    syntaxProp: teacherProp
   }
-
-  res
-    .status(status)
-    .json(result)
-}
+})
 
 export default addTeacher

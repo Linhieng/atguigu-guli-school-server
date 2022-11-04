@@ -1,8 +1,6 @@
-import { RequestHandler } from 'express'
-import { Error } from 'mongoose'
 import { EduTeacher } from '../../models/eduModel'
 import { formatDate } from '../../util/base'
-import { catchError, checkRequired, checkSyntax, factoryR, wrappingCheckError } from '../func'
+import { handleRequest } from '../func'
 
 type BodyProp = { // 前端传递的格式
   name?: string,
@@ -87,35 +85,17 @@ async function findData (params: Params, query: QueryProp): Promise<ResData> {
   }
 }
 
-const getPageTeacherByQuery: RequestHandler = async (req, res) => {
-  const result = factoryR()
-  let status = 500
-
-  try {
-    const params = req.params as unknown as Params
-    const body = req.body as unknown as BodyProp
-
-    wrappingCheckError(params, paramsProp)
-    wrappingCheckError(body, bodyProp, {})
-    result.data = await findData(params, getQuery(body))
-
-    status = 200
-    result.success = true
-    result.code = SUCCESS
-    result.message = '请求成功'
-  } catch (e) {
-
-    const { status: s, code, message, data } = catchError(e as Error)
-    status = s
-    result.success = false
-    result.code = code
-    result.message = message
-    result.data = data
-
+const getPageTeacherByQuery = handleRequest(async (req) => {
+  const params = req.params as unknown as Params
+  const body = req.body as unknown as BodyProp
+  return await findData(params, getQuery(body))
+}, {
+  checkBody: {
+    syntaxProp: bodyProp,
+    requiredProp: {},
+  },
+  checkParams: {
+    syntaxProp: paramsProp
   }
-
-  res
-    .status(status)
-    .json(result)
-}
+})
 export default getPageTeacherByQuery

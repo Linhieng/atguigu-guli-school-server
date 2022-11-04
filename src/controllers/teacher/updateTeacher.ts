@@ -1,7 +1,6 @@
-import { RequestHandler } from 'express'
-import { Types, Error, Schema } from 'mongoose'
+import { Types } from 'mongoose'
 import { EduTeacher } from '../../models/eduModel'
-import { catchError, checkRequired, checkSyntax, factoryR, wrappingCheckError } from '../func'
+import { handleRequest } from '../func'
 
 type Teacher = {
   id: string,
@@ -14,8 +13,8 @@ type Teacher = {
 }
 
 const teacherProp = {
-  id: 'string',
-  name: 'string',
+  id: 'ObjectId',
+  name: 'String',
   sort: 'number',
   level: 'number',
   career: 'string',
@@ -31,41 +30,21 @@ async function update (body: Teacher) {
     newData[item] = body[(item as keyof Teacher)]
   })
   newData.gmt_modified = new Date()
-  await EduTeacher
+  return await EduTeacher
     .findOneAndUpdate({
       _id: new Types.ObjectId(body.id),
       is_deleted: false,
     }, newData)
 }
 
-const updateTeacher: RequestHandler = async (req, res) => {
-  const result = factoryR()
-  let status = 500
-
-  try {
-    const body = req.body as unknown as Teacher
-
-    wrappingCheckError(body, teacherProp)
-    await update(body)
-
-    status = 200
-    result.success = true
-    result.code = SUCCESS
-    result.message = '成功'
-  } catch (e) {
-
-    const { status: s, code, message, data } = catchError(e as Error)
-    status = s
-    result.success = false
-    result.code = code
-    result.message = message
-    result.data = data
-
+const updateTeacher = handleRequest(async (req) => {
+  const body = req.body as unknown as Teacher
+  const newTeacher = await update(body)
+  return { newTeacher }
+}, {
+  checkBody: {
+    syntaxProp: teacherProp
   }
-
-  res
-    .status(status)
-    .json(result)
-}
+})
 
 export default updateTeacher
