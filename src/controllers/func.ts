@@ -43,6 +43,8 @@ export function checkRequired (data: Record<string, unknown>, requiredProp: Reco
  * @Error 如果校验失败, 会抛出 PropertySyntaxError
  */
 export function checkSyntax (data: Record<string, unknown>, dataType: Record<string, string>) {
+  // 注意此处是对 data 提取 key, 而不是对 dataType 提取 key,
+  // 之所以对 data 提取 key, 是因为存在这么一种需求: 某些属性可以没有, 但如果有这些属性, 则类型一定要对
   Object.keys(data).forEach((prop) => {
     const expectType = dataType[prop]
     const realType = typeof data[prop]
@@ -146,8 +148,9 @@ export function checkMime (file: Express.Multer.File, mimeArr: Array<string>, ty
 
 /**
  * 封装基本的属性校验, 进行属性是否存在和格式是否正确的基础校验
- * @param data
- * @param dataProp
+ * @param data 待校验的数据
+ * @param syntaxProp 声明数据的类型, key 是属性值, value 是具体类型的字符串
+ * @param requiredProp 可选的, 当出现这么一种需求时, 可以使用: 某些属性可以没有, 但如果有这些属性, 则类型一定要对
  * @Error 校验失败时, 将 PropertyRequiredError 和 PropertySyntaxError 错误封装成 ReadError, 其他错误照常抛出
  */
 export function wrappingCheckError (data: Record<string, unknown>, syntaxProp: Record<string, string>, requiredProp?: Record<string, string>) {
@@ -250,21 +253,40 @@ export function catchError (e: Error) {
  */
 type handleOptions = {
   successMessage?: string
+  checkBody?: {
+    syntaxProp: Record<string, string>,
+    requiredProp?: Record<string, any>
+  }
+  checkParams?: {
+    syntaxProp: Record<string, string>,
+    requiredProp?: Record<string, any>
+  }
 }
 type Callback = (req: Express.Request) => any
 export function handleRequest (cb: Callback, options?: handleOptions): RequestHandler {
   return async (req, res) => {
     const result = factoryR()
     let status = 500
+    const successMessage = options?.successMessage || '请求成功'
+    const checkBody = options?.checkBody
+    const checkParams = options?.checkParams
 
     try {
+
+
+      if (checkBody) {
+        wrappingCheckError(req.body, checkBody.syntaxProp, checkBody.requiredProp)
+      }
+      if (checkParams) {
+        wrappingCheckError(req.params, checkParams.syntaxProp, checkParams.requiredProp)
+      }
 
       result.data = await cb(req) || {}
 
       status = 200
       result.success = true
       result.code = SUCCESS
-      result.message = options?.successMessage || '请求成功'
+      result.message = successMessage
 
     } catch (e) {
 

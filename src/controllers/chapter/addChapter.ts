@@ -24,8 +24,11 @@ async function add (body: Chapter) {
 
 
 const addChapter = handleRequest(async (req) => {
-  wrappingCheckError(req.body, chapterProp)
   await add(req.body as Chapter)
+}, {
+  checkBody: {
+    syntaxProp: chapterProp
+  }
 })
 
 export default addChapter
